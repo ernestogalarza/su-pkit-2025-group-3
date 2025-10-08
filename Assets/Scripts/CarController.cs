@@ -1,91 +1,90 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
+    [Header("Wheel Colliders (FrontLeft, FrontRight, RearLeft, RearRight)")]
+    public WheelCollider wcFL;
+    public WheelCollider wcFR;
+    public WheelCollider wcRL;
+    public WheelCollider wcRR;
 
-    public float speed = 5.0f;
-    public float turnSpeed = 20.0f;
-    public float horizontalInput;
-    public float forwardInput;
+    [Header("Wheel Meshes")]
+    public Transform wFL;
+    public Transform wFR;
+    public Transform wRL;
+    public Transform wRR;
 
-    public bool isMoving = false;
+    [Header("Center of Mass")]
+    public Transform centerOfMass;
 
-    public Transform steeringWheel;
-    public float steeringLimitAngle = 100f;
-    public float steeringRotationSpeed = 60f;
-    public float returnSpeed = 2f;
+    [Header("Car Physics Settings")]
+    public float maxMotorTorque = 1500f;   // Torque applied to drive wheels
+    public float maxSteerAngle = 30f;      // Maximum steering angle in degrees
+    public float maxBrakeTorque = 3000f;   // Brake torque
 
+    private Rigidbody rb;
 
-
-
-    private Rigidbody carRb;
-
-    // Start is called before the first frame update
     void Start()
     {
-        Input.
-        carRb = GetComponent<Rigidbody>();
-        carRb.drag = 2f; // You can adjust this value
-        carRb.angularDrag = 2f;
+        rb = GetComponent<Rigidbody>();
+        if (centerOfMass != null)
+        {
+            // Set Rigidbody center of mass relative to the Rigidbody transform
+            rb.centerOfMass = transform.InverseTransformPoint(centerOfMass.position);
+        }
+
     }
 
-    // Update is called once per frame
     void Update()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
-        forwardInput = Input.GetAxis("Vertical");
+        // Input handling is done in Update()
+        // You can extend this later for better input systems
+    }
 
-        UpdateSteerWheel(horizontalInput);
+    void FixedUpdate()
+    {
+        // Read inputs from legacy Input Manager
+        float steer = Input.GetAxis("Horizontal");   // A/D or Left/Right
+        float throttle = Input.GetAxis("Vertical");  // W/S or Up/Down
+        bool braking = Input.GetKey(KeyCode.Space);  // Space bar for brake
 
-        if(Input.GetKeyDown(KeyCode.Space))   
-        {
-            isMoving = !isMoving;
+        // Calculate motor torque & steering angle
+        float motor = maxMotorTorque * throttle;
+        float steerAngle = maxSteerAngle * steer;
+        float brake = braking ? maxBrakeTorque : 0f;
 
+        // Apply steering to front wheels
+        if (wcFL != null) wcFL.steerAngle = steerAngle;
+        if (wcFR != null) wcFR.steerAngle = steerAngle;
 
-            // Move the vehicle forward based on vertical input
-            //carRb.AddForce(transform.forward * Time.deltaTime * speed * forwardInput, ForceMode.Impulse);
-            
-            //transform.Translate(Vector3.forward * Time.deltaTime * speed * forwardInput);
-        }
+        // Apply motor torque to front wheels
+        if (wcFL != null) wcFL.motorTorque = motor;
+        if (wcFR != null) wcFR.motorTorque = motor;
 
-        if(isMoving)
-        {
-            //transform.Translate(Vector3.forward * Time.deltaTime * speed);
-            carRb.velocity = transform.forward * speed;
-        }
-        else
-        {
-            carRb.velocity = Vector3.zero;
-        }
-        transform.Rotate(Vector3.up, turnSpeed * horizontalInput * Time.deltaTime);
+        // Apply brake torque to all wheels
+        if (wcFL != null) wcFL.brakeTorque = brake;
+        if (wcFR != null) wcFR.brakeTorque = brake;
+        if (wcRL != null) wcRL.brakeTorque = brake;
+        if (wcRR != null) wcRR.brakeTorque = brake;
+
+        // Update the wheel meshes' position and rotation to match colliders
+        UpdateWheelPose(wcFL, wFL);
+        UpdateWheelPose(wcFR, wFR);
+        UpdateWheelPose(wcRL, wRL);
+        UpdateWheelPose(wcRR, wRR);
+
+        Debug.Log($"Throttle: {throttle}, MotorTorque: {motor}");
 
     }
 
-    private void UpdateSteerWheel(float horizontalInput)
+    // Helper method to sync WheelCollider pose with visual wheel
+    void UpdateWheelPose(WheelCollider collider, Transform wheel)
     {
-        if (horizontalInput != 0f)
-        {
-            steeringWheel.Rotate(Vector3.forward, -horizontalInput * steeringRotationSpeed * Time.deltaTime);
-        }
-        else if (horizontalInput == 0f && steeringWheel.localEulerAngles.z > 5f)
-        {
-            // Smoothly return the steering wheel to the original position when no input
-            float currentZ = steeringWheel.localEulerAngles.z;
-            // Ensure the angle is between 0-360 degrees (as Euler angles can wrap)
-            if (currentZ > 180f)
-                currentZ -= 360f;
-            // Gradually return to 0 using Lerp, for smooth transition
-            float smoothRotation = Mathf.Lerp(currentZ, 0f, Time.deltaTime * returnSpeed);
-            steeringWheel.localEulerAngles = new Vector3(steeringWheel.localEulerAngles.x,
-                                                         steeringWheel.localEulerAngles.y,
-                                                         smoothRotation);
-
-
-            //steeringWheel.localEulerAngles = new Vector3(steeringWheel.localEulerAngles.x,
-            //                                            steeringWheel.localEulerAngles.y,
-            //                                            0f);
-        }
+        if (collider == null || wheel == null) return;
+        Vector3 pos;
+        Quaternion rot;
+        collider.GetWorldPose(out pos, out rot);
+        wheel.position = pos;
+        wheel.rotation = rot;
     }
 }

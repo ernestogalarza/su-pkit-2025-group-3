@@ -26,8 +26,8 @@ public class HandleController : MonoBehaviour
     void Start()
     {
         carRb = GetComponent<Rigidbody>();
-        carRb.drag = 2f; // You can adjust this value
-        carRb.angularDrag = 2f;
+        carRb.linearDamping = 2f; // You can adjust this value
+        carRb.angularDamping = 2f;
     }
 
     // Update is called once per frame
@@ -43,20 +43,16 @@ public class HandleController : MonoBehaviour
             isMoving = !isMoving;
 
 
-            // Move the vehicle forward based on vertical input
-            //carRb.AddForce(transform.forward * Time.deltaTime * speed * forwardInput, ForceMode.Impulse);
-
-            //transform.Translate(Vector3.forward * Time.deltaTime * speed * forwardInput);
         }
 
         if (isMoving)
         {
             //transform.Translate(Vector3.forward * Time.deltaTime * speed);
-            carRb.velocity = transform.forward * speed;
+            carRb.linearVelocity = transform.forward * speed;
         }
         else
         {
-            carRb.velocity = Vector3.zero;
+            carRb.linearVelocity = Vector3.zero;
         }
         transform.Rotate(Vector3.up, turnSpeed * horizontalInput * Time.deltaTime);
 
@@ -74,7 +70,7 @@ public class HandleController : MonoBehaviour
             if (newYRotation > 270f)
                 newYRotation -= 360f;
 
-            // Ensure the angle is between 60 and 120 degrees (90 ± 30)
+            // Ensure the angle is between 60 and 120 degrees (90 ï¿½ 30)
             newYRotation = Mathf.Clamp(newYRotation, 60f, 120f);
 
             // Apply the clamped rotation
@@ -99,43 +95,4 @@ public class HandleController : MonoBehaviour
             steeringWheel.localEulerAngles = new Vector3(steeringWheel.localEulerAngles.x, smoothRotation, steeringWheel.localEulerAngles.z);
         }
     }
-
-    /*public void UpdateSteerWheel(float horizontalInput)
-    {
-        if (horizontalInput != 0f)
-        {
-            // Calculate the new y-rotation based on input
-            float newYRotation = steeringWheel.localEulerAngles.y + horizontalInput * steeringRotationSpeed * Time.deltaTime;
-
-            // Ensure the angle is between 60 and 120 degrees (90 ± 30)
-            newYRotation = Mathf.Clamp(newYRotation, 60f, 120f);
-
-            steeringWheel.Rotate(Vector3.up, horizontalInput * steeringRotationSpeed * Time.deltaTime);
-        }
-        else if (horizontalInput == 0f && steeringWheel.localEulerAngles.y > 5f)
-        {
-            // Smoothly return the steering wheel to the original position when no input
-            float currentY = steeringWheel.localEulerAngles.y;
-
-            // Ensure the angle is between 0-360 degrees (as Euler angles can wrap)
-            if (currentY > 270f)
-                currentY -= 360f;
-
-            // Gradually return to 90 using Lerp, for smooth transition
-            float smoothRotation = Mathf.Lerp(currentY, 90f, Time.deltaTime * returnSpeed);
-
-            // Clamp the return value to ensure it's between 60 and 120 degrees
-            smoothRotation = Mathf.Clamp(smoothRotation, 60f, 120f);
-
-            // Apply the smoothed rotation
-            steeringWheel.localEulerAngles = new Vector3(steeringWheel.localEulerAngles.x,
-                                                         smoothRotation,
-                                                         steeringWheel.localEulerAngles.z);
-
-
-            //steeringWheel.localEulerAngles = new Vector3(steeringWheel.localEulerAngles.x,
-            //                                            steeringWheel.localEulerAngles.y,
-            //                                            0f);
-        } 
-    }*/
 }

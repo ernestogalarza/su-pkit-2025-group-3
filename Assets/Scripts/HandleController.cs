@@ -26,8 +26,8 @@ public class HandleController : MonoBehaviour
     void Start()
     {
         carRb = GetComponent<Rigidbody>();
-        carRb.drag = 2f; // You can adjust this value
-        carRb.angularDrag = 2f;
+        carRb.linearDamping = 2f; // You can adjust this value
+        carRb.angularDamping = 2f;
     }
 
     // Update is called once per frame
@@ -52,11 +52,11 @@ public class HandleController : MonoBehaviour
         if (isMoving)
         {
             //transform.Translate(Vector3.forward * Time.deltaTime * speed);
-            carRb.velocity = transform.forward * speed;
+            carRb.linearVelocity = transform.forward * speed;
         }
         else
         {
-            carRb.velocity = Vector3.zero;
+            carRb.linearVelocity = Vector3.zero;
         }
         transform.Rotate(Vector3.up, turnSpeed * horizontalInput * Time.deltaTime);
 
@@ -74,7 +74,7 @@ public class HandleController : MonoBehaviour
             if (newYRotation > 270f)
                 newYRotation -= 360f;
 
-            // Ensure the angle is between 60 and 120 degrees (90 ± 30)
+            // Ensure the angle is between 60 and 120 degrees (90 ï¿½ 30)
             newYRotation = Mathf.Clamp(newYRotation, 60f, 120f);
 
             // Apply the clamped rotation
@@ -107,7 +107,7 @@ public class HandleController : MonoBehaviour
             // Calculate the new y-rotation based on input
             float newYRotation = steeringWheel.localEulerAngles.y + horizontalInput * steeringRotationSpeed * Time.deltaTime;
 
-            // Ensure the angle is between 60 and 120 degrees (90 ± 30)
+            // Ensure the angle is between 60 and 120 degrees (90 ï¿½ 30)
             newYRotation = Mathf.Clamp(newYRotation, 60f, 120f);
 
             steeringWheel.Rotate(Vector3.up, horizontalInput * steeringRotationSpeed * Time.deltaTime);

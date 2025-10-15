@@ -1,91 +1,105 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI; // Necesario para usar Text o TextMeshProUGUI
+using TMPro;
 public class CarController : MonoBehaviour
 {
 
-    public float speed = 5.0f;
-    public float turnSpeed = 20.0f;
-    public float horizontalInput;
-    public float forwardInput;
+//public float speed = 5.0f;
+//public float turnSpeed = 20.0f;
+//public float horizontalInput;
+//public float forwardInput;
 
-    public bool isMoving = false;
+  //  public bool isMoving = false;
 
-    public Transform steeringWheel;
-    public float steeringLimitAngle = 100f;
-    public float steeringRotationSpeed = 60f;
-    public float returnSpeed = 2f;
+   // public Transform steeringWheel;
+  //  public float steeringLimitAngle = 100f;
+  //  public float steeringRotationSpeed = 60f;
+  //  public float returnSpeed = 2f;
 
-
-
+  
+  public float acceleration = 20f;     // km/h por segundo
+  public float brakeForce = 30f;       // km/h por segundo
+  public float maxSpeed = 100f;        // km/h
+  public float turnSpeed = 60f;        // grados por segundo
+  public float drag = 0.98f;           // fricción
+//  private Rigidbody rb;
+    private float currentSpeed = 0f;     // km/h
+    private Rigidbody rb;
 
     private Rigidbody carRb;
+    public TextMeshProUGUI speedText;               // Referencia al texto en la UI (opcional)
+    
 
     // Start is called before the first frame update
     void Start()
     {
-        Input.
-        carRb = GetComponent<Rigidbody>();
-        carRb.drag = 2f; // You can adjust this value
-        carRb.angularDrag = 2f;
+      
+        rb = GetComponent<Rigidbody>();
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        
     }
+    
+     
 
     // Update is called once per frame
     void Update()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
-        forwardInput = Input.GetAxis("Vertical");
-
-        UpdateSteerWheel(horizontalInput);
-
-        if(Input.GetKeyDown(KeyCode.Space))   
-        {
-            isMoving = !isMoving;
-
-
-            // Move the vehicle forward based on vertical input
-            //carRb.AddForce(transform.forward * Time.deltaTime * speed * forwardInput, ForceMode.Impulse);
-            
-            //transform.Translate(Vector3.forward * Time.deltaTime * speed * forwardInput);
-        }
-
-        if(isMoving)
-        {
-            //transform.Translate(Vector3.forward * Time.deltaTime * speed);
-            carRb.velocity = transform.forward * speed;
-        }
-        else
-        {
-            carRb.velocity = Vector3.zero;
-        }
-        transform.Rotate(Vector3.up, turnSpeed * horizontalInput * Time.deltaTime);
-
+        HandleMovement();
+        UpdateSpeedDisplay();
     }
-
-    private void UpdateSteerWheel(float horizontalInput)
+    
+    void HandleMovement()
     {
-        if (horizontalInput != 0f)
+        // ↑ Acelerar
+        if (Input.GetKey(KeyCode.UpArrow))
         {
-            steeringWheel.Rotate(Vector3.forward, -horizontalInput * steeringRotationSpeed * Time.deltaTime);
+            currentSpeed += acceleration * Time.deltaTime;
         }
-        else if (horizontalInput == 0f && steeringWheel.localEulerAngles.z > 5f)
+
+        // ↓ Frenar / retroceder
+        if (Input.GetKey(KeyCode.DownArrow))
         {
-            // Smoothly return the steering wheel to the original position when no input
-            float currentZ = steeringWheel.localEulerAngles.z;
-            // Ensure the angle is between 0-360 degrees (as Euler angles can wrap)
-            if (currentZ > 180f)
-                currentZ -= 360f;
-            // Gradually return to 0 using Lerp, for smooth transition
-            float smoothRotation = Mathf.Lerp(currentZ, 0f, Time.deltaTime * returnSpeed);
-            steeringWheel.localEulerAngles = new Vector3(steeringWheel.localEulerAngles.x,
-                                                         steeringWheel.localEulerAngles.y,
-                                                         smoothRotation);
+            currentSpeed -= brakeForce * Time.deltaTime;
+        }
 
+        // Limitar velocidad (permitiendo un poco en reversa)
+        currentSpeed = Mathf.Clamp(currentSpeed, -maxSpeed / 2, maxSpeed);
 
-            //steeringWheel.localEulerAngles = new Vector3(steeringWheel.localEulerAngles.x,
-            //                                            steeringWheel.localEulerAngles.y,
-            //                                            0f);
+        // ← / → Girar
+        float turn = 0f;
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            turn = -turnSpeed * Time.deltaTime;
+        }
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            turn = turnSpeed * Time.deltaTime;
+        }
+
+        // Aplicar rotación
+        transform.Rotate(0f, turn, 0f);
+
+        // Convertir km/h → m/s (1 km/h = 0.27778 m/s)
+        float speedInMetersPerSec = currentSpeed * 0.27778f;
+
+        // Mover el coche
+        rb.MovePosition(rb.position + transform.forward * speedInMetersPerSec * Time.deltaTime);
+
+        // Desaceleración natural
+        currentSpeed *= drag;
+    }
+
+    void UpdateSpeedDisplay()
+    {
+        if (speedText != null)
+        {
+            float shownSpeed = Mathf.Abs(currentSpeed);
+            speedText.text = shownSpeed.ToString("F1") + " km/h";
         }
     }
+    
+    
+    
 }

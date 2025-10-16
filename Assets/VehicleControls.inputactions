@@ -1,0 +1,55 @@
+{
+    "version": 1,
+    "name": "VehicleControls",
+    "maps": [
+        {
+            "name": "Vehicle",
+            "id": "7dc0bf89-31b2-47b0-ac09-545c11ba11e0",
+            "actions": [
+                {
+                    "name": "Steering",
+                    "type": "Value",
+                    "id": "b346c894-7415-4cfe-9cde-0b1b31348287",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Throttle",
+                    "type": "Value",
+                    "id": "74ce0b33-3b82-4db0-a3aa-453bcbdabe8e",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "7d926f75-f4eb-4f23-a706-3ba11bb1f273",
+                    "path": "<HID::44F B692>/stick/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Steering",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8f63e12c-c6f2-4a8f-b240-46689b679f43",
+                    "path": "<HID::44F B692>/rz",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Throttle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

@@ -30,12 +30,15 @@ public class CarController : MonoBehaviour
 
     private Rigidbody carRb;
     public TextMeshProUGUI speedText;               // Referencia al texto en la UI (opcional)
-    
+
+    private SteeringWheelManager steeringWheelManager;
+    private float wheelDirection = 0f;
+
 
     // Start is called before the first frame update
     void Start()
     {
-      
+        steeringWheelManager = GameObject.Find("SteeringWheelManager").GetComponent<SteeringWheelManager>();
         rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         
@@ -47,11 +50,15 @@ public class CarController : MonoBehaviour
     void Update()
     {
         HandleMovement();
-        UpdateSpeedDisplay();
+      //  UpdateSpeedDisplay();
     }
     
     void HandleMovement()
     {
+        speedText.text = steeringWheelManager.getStaringWheelDirection().ToString();
+
+        wheelDirection = steeringWheelManager.getStaringWheelDirection();
+
         // ↑ Acelerar
         if (Input.GetKey(KeyCode.UpArrow))
         {
@@ -69,14 +76,19 @@ public class CarController : MonoBehaviour
 
         // ← / → Girar
         float turn = 0f;
+        turn = wheelDirection;
+        /*
         if (Input.GetKey(KeyCode.LeftArrow))
         {
             turn = -turnSpeed * Time.deltaTime;
+           // speedText.text = turn.ToString();
         }
         if (Input.GetKey(KeyCode.RightArrow))
         {
             turn = turnSpeed * Time.deltaTime;
-        }
+
+         //  speedText.text = turn.ToString();
+        } */
 
         // Aplicar rotación
         transform.Rotate(0f, turn, 0f);

@@ -1,90 +1,100 @@
 using UnityEngine;
 
-public class CarController : MonoBehaviour
+public class CarControllerCustom : MonoBehaviour
 {
-    [Header("Wheel Colliders (FrontLeft, FrontRight, RearLeft, RearRight)")]
-    public WheelCollider wcFL;
-    public WheelCollider wcFR;
-    public WheelCollider wcRL;
-    public WheelCollider wcRR;
+    [Header("Wheel Colliders")]
+    public WheelCollider frontLeftCollider;
+    public WheelCollider frontRightCollider;
+    public WheelCollider rearLeftCollider;
+    public WheelCollider rearRightCollider;
 
     [Header("Wheel Meshes")]
-    public Transform wFL;
-    public Transform wFR;
-    public Transform wRL;
-    public Transform wRR;
+    public Transform frontLeftMesh;
+    public Transform frontRightMesh;
+    public Transform rearLeftMesh;
+    public Transform rearRightMesh;
 
-    [Header("Center of Mass")]
-    public Transform centerOfMass;
+    [Header("Pointers")]
+    public Transform speedPointer;   // car-speedpointer
+    public Transform rpmPointer;     // car-rmppointer (if needed)
 
-    [Header("Car Physics Settings")]
-    public float maxMotorTorque = 1500f;   // Torque applied to drive wheels
-    public float maxSteerAngle = 30f;      // Maximum steering angle in degrees
-    public float maxBrakeTorque = 3000f;   // Brake torque
-
-    private Rigidbody rb;
+    [Header("Settings")]
+    public float maxMotorTorque = 500f;
+    public float maxSteeringAngle = 30f;
+    public float brakeTorque = 300f;
+    public Rigidbody rb;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        if (centerOfMass != null)
-        {
-            // Set Rigidbody center of mass relative to the Rigidbody transform
-            rb.centerOfMass = transform.InverseTransformPoint(centerOfMass.position);
-        }
-
-    }
-
-    void Update()
-    {
-        // Input handling is done in Update()
-        // You can extend this later for better input systems
+        if (rb == null) rb = GetComponent<Rigidbody>();
     }
 
     void FixedUpdate()
     {
-        // Read inputs from legacy Input Manager
-        float steer = Input.GetAxis("Horizontal");   // A/D or Left/Right
-        float throttle = Input.GetAxis("Vertical");  // W/S or Up/Down
-        bool braking = Input.GetKey(KeyCode.Space);  // Space bar for brake
+        float motor = maxMotorTorque * Input.GetAxis("Vertical");
+        float steer = maxSteeringAngle * Input.GetAxis("Horizontal");
 
-        // Calculate motor torque & steering angle
-        float motor = maxMotorTorque * throttle;
-        float steerAngle = maxSteerAngle * steer;
-        float brake = braking ? maxBrakeTorque : 0f;
+        // Apply motor torque
+        rearLeftCollider.motorTorque  = motor;
+        rearRightCollider.motorTorque = motor;
 
-        // Apply steering to front wheels
-        if (wcFL != null) wcFL.steerAngle = steerAngle;
-        if (wcFR != null) wcFR.steerAngle = steerAngle;
+        // Apply steering
+        frontLeftCollider.steerAngle  = steer;
+        frontRightCollider.steerAngle = steer;
 
-        // Apply motor torque to front wheels
-        if (wcFL != null) wcFL.motorTorque = motor;
-        if (wcFR != null) wcFR.motorTorque = motor;
+        // Apply brake when reversing or stopping
+        if (Input.GetAxis("Vertical") < 0)
+        {
+            rearLeftCollider.brakeTorque  = brakeTorque;
+            rearRightCollider.brakeTorque = brakeTorque;
+        }
+        else
+        {
+            rearLeftCollider.brakeTorque  = 0;
+            rearRightCollider.brakeTorque = 0;
+        }
 
-        // Apply brake torque to all wheels
-        if (wcFL != null) wcFL.brakeTorque = brake;
-        if (wcFR != null) wcFR.brakeTorque = brake;
-        if (wcRL != null) wcRL.brakeTorque = brake;
-        if (wcRR != null) wcRR.brakeTorque = brake;
+        UpdateWheelVisual(frontLeftCollider, frontLeftMesh);
+        UpdateWheelVisual(frontRightCollider, frontRightMesh);
+        UpdateWheelVisual(rearLeftCollider, rearLeftMesh);
+        UpdateWheelVisual(rearRightCollider, rearRightMesh);
 
-        // Update the wheel meshes' position and rotation to match colliders
-        UpdateWheelPose(wcFL, wFL);
-        UpdateWheelPose(wcFR, wFR);
-        UpdateWheelPose(wcRL, wRL);
-        UpdateWheelPose(wcRR, wRR);
-
-        Debug.Log($"Throttle: {throttle}, MotorTorque: {motor}");
-
+        UpdatePointers();
     }
 
-    // Helper method to sync WheelCollider pose with visual wheel
-    void UpdateWheelPose(WheelCollider collider, Transform wheel)
+    void UpdateWheelVisual(WheelCollider col, Transform mesh)
     {
-        if (collider == null || wheel == null) return;
-        Vector3 pos;
-        Quaternion rot;
-        collider.GetWorldPose(out pos, out rot);
-        wheel.position = pos;
-        wheel.rotation = rot;
+         // 1. Get the world position & rotation from the collider
+    Vector3 pos;
+    Quaternion rot;
+    col.GetWorldPose(out pos, out rot);
+
+    // 2. Apply world position
+    mesh.position = pos;
+
+    // 3. Extract the steering angle (col.steerAngle) into a yaw rotation
+    float steer = col.steerAngle;
+    Quaternion steerRotation = Quaternion.Euler(0f, steer, 0f);
+
+    // 4. Combine the collider’s roll/pitch rotation (rot) with yaw steerRotation
+    mesh.rotation = rot * steerRotation;
+    }
+
+    void UpdatePointers()
+    {
+        if (speedPointer != null)
+        {
+            float speed = rb.linearVelocity.magnitude * 3.6f; // km/h
+            // Map speed to pointer rotation (0–240 km/h → 0–270°)
+            float speedAngle = Mathf.Clamp(speed / 240f, 0f, 1f) * 270f;
+            speedPointer.localRotation = Quaternion.Euler(0, 0, -speedAngle);
+        }
+        if (rpmPointer != null)
+        {
+            // Example RPM mapping (0–8000 RPM → 0–270°)
+            float rpm = Mathf.Clamp01(Mathf.Abs(rb.angularVelocity.y) / 8000f);
+            float rpmAngle = rpm * 270f;
+            rpmPointer.localRotation = Quaternion.Euler(0, 0, -rpmAngle);
+        }
     }
 }

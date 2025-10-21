@@ -3,28 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; // Necesario para usar Text o TextMeshProUGUI
 using TMPro;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem;
+using static UnityEngine.Rendering.DebugUI;
 public class CarController : MonoBehaviour
 {
 
-//public float speed = 5.0f;
-//public float turnSpeed = 20.0f;
-//public float horizontalInput;
-//public float forwardInput;
-
-  //  public bool isMoving = false;
-
-   // public Transform steeringWheel;
-  //  public float steeringLimitAngle = 100f;
-  //  public float steeringRotationSpeed = 60f;
-  //  public float returnSpeed = 2f;
-
-  
-  public float acceleration = 20f;     // km/h por segundo
-  public float brakeForce = 30f;       // km/h por segundo
-  public float maxSpeed = 100f;        // km/h
-  public float turnSpeed = 60f;        // grados por segundo
-  public float drag = 0.98f;           // fricción
-//  private Rigidbody rb;
+    public bool handlerKeyboard = true;
+    public float acceleration = 20f;     // km/h por segundo
+    public float brakeForce = 30f;       // km/h por segundo
+    public float maxSpeed = 100f;        // km/h
+    public float turnSpeed = 60f;        // grados por segundo
+    public float drag = 0.98f;           // fricción
     private float currentSpeed = 0f;     // km/h
     private Rigidbody rb;
 
@@ -33,6 +23,12 @@ public class CarController : MonoBehaviour
 
     private SteeringWheelManager steeringWheelManager;
     private float wheelDirection = 0f;
+
+    private VehicleControls controls;
+    private float wheel;
+    private float throttle;
+
+
 
 
     // Start is called before the first frame update
@@ -44,32 +40,56 @@ public class CarController : MonoBehaviour
         
     }
     
-     
 
     // Update is called once per frame
     void Update()
     {
-        HandleMovement();
-      //  UpdateSpeedDisplay();
+         HandleMovement();
     }
-    
-    void HandleMovement()
-    {
-        speedText.text = steeringWheelManager.getStaringWheelDirection().ToString();
 
-        wheelDirection = steeringWheelManager.getStaringWheelDirection();
+    private void acceleratorArrowKey(float value) {
 
-        // ↑ Acelerar
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (value > 0)
         {
             currentSpeed += acceleration * Time.deltaTime;
         }
+    }
+
+    private void acceleratorSteeringWheel(float value)
+    {
+
+            currentSpeed += acceleration * Time.deltaTime * -value;
+
+            if(currentSpeed<0) currentSpeed= 0;
+    }
+
+    void HandleMovement()
+    {
+        //Throttle
+         speedText.text = steeringWheelManager.getThrottle().ToString();
+         wheelDirection = steeringWheelManager.getWheelDirection();
+
+        float throttle = steeringWheelManager.getThrottle();
+
+        Debug.Log($"throttle: {throttle:F2}");
+
+        if (handlerKeyboard)
+        {
+            acceleratorArrowKey(throttle);
+
+        }
+        else
+        {
+            acceleratorSteeringWheel(throttle);
+        }
+       
+
 
         // ↓ Frenar / retroceder
         if (Input.GetKey(KeyCode.DownArrow))
         {
             currentSpeed -= brakeForce * Time.deltaTime;
-        }
+        } 
 
         // Limitar velocidad (permitiendo un poco en reversa)
         currentSpeed = Mathf.Clamp(currentSpeed, -maxSpeed / 2, maxSpeed);
@@ -77,19 +97,6 @@ public class CarController : MonoBehaviour
         // ← / → Girar
         float turn = 0f;
         turn = wheelDirection;
-        /*
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            turn = -turnSpeed * Time.deltaTime;
-           // speedText.text = turn.ToString();
-        }
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            turn = turnSpeed * Time.deltaTime;
-
-         //  speedText.text = turn.ToString();
-        } */
-
         // Aplicar rotación
         transform.Rotate(0f, turn, 0f);
 
@@ -103,15 +110,6 @@ public class CarController : MonoBehaviour
         currentSpeed *= drag;
     }
 
-    void UpdateSpeedDisplay()
-    {
-        if (speedText != null)
-        {
-            float shownSpeed = Mathf.Abs(currentSpeed);
-            speedText.text = shownSpeed.ToString("F1") + " km/h";
-        }
-    }
-    
     
     
 }

@@ -206,7 +206,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.338, y: 1.264, z: 0.3390131}
+  m_LocalPosition: {x: -0.38, y: 1.264, z: 0.3390131}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -256,6 +256,11 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!4 &370925099 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4798187664917948, guid: 5816422dd14e29c408efc4d163fb38a9, type: 3}
+  m_PrefabInstance: {fileID: 710510496}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,6 +484,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: l10km_cc4_sl20_t(12123025)_rw10_wh3_n3_RsBTW_MeshV00_m
       objectReference: {fileID: 0}
+    - target: {fileID: 167940, guid: 6215070e0f160d74998efe50358b3d5e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 431114, guid: 6215070e0f160d74998efe50358b3d5e, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4.0749273
@@ -536,6 +545,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RealisticCar01_Driving_Prefab02
       objectReference: {fileID: 0}
+    - target: {fileID: 1443848389736554, guid: 5816422dd14e29c408efc4d163fb38a9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1540290328325750, guid: 5816422dd14e29c408efc4d163fb38a9, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -586,19 +599,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4798187664917948, guid: 5816422dd14e29c408efc4d163fb38a9, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.722886
+      value: 0.94906366
       objectReference: {fileID: 0}
     - target: {fileID: 4798187664917948, guid: 5816422dd14e29c408efc4d163fb38a9, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.06520923
+      value: -0.13677916
       objectReference: {fileID: 0}
     - target: {fileID: 4798187664917948, guid: 5816422dd14e29c408efc4d163fb38a9, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.3055919
+      value: -0.28094518
       objectReference: {fileID: 0}
     - target: {fileID: 4798187664917948, guid: 5816422dd14e29c408efc4d163fb38a9, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.6162769
+      value: -0.040489852
       objectReference: {fileID: 0}
     - target: {fileID: 4798187664917948, guid: 5816422dd14e29c408efc4d163fb38a9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -610,7 +623,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4798187664917948, guid: 5816422dd14e29c408efc4d163fb38a9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -76.011
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 199236995947391174, guid: 5816422dd14e29c408efc4d163fb38a9, type: 3}
       propertyPath: m_Materials.Array.size
@@ -652,13 +665,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9181d866f8c78e0469c1713575978dd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  handlerKeyboard: 1
-  acceleration: 80
-  brakeForce: 15
-  maxSpeed: 120
+  handlerKeyboard: 0
+  acceleration: 30
+  brakeForce: 100
+  friction: 10
+  maxSpeed: 180
   turnSpeed: 20
-  drag: 0.99
+  speedometerNeedle: {fileID: 370925099}
   speedText: {fileID: 1963629579}
+  minSpeed: 0
+  maxSpeedometerSpeed: 240
+  minRotationZ: 0
+  maxRotationZ: -280
 --- !u!4 &710510501 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4166157909200910, guid: 5816422dd14e29c408efc4d163fb38a9, type: 3}

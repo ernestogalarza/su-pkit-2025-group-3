@@ -189,6 +189,17 @@ public partial class @VehicleControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""4514788e-bbf3-4d7e-9264-ca3520895c62"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Brake"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""bcdf85da-45b4-41a3-bfe7-50ec045c84c2"",
                     ""path"": ""<HID::44F B692>/stick/down"",
                     ""interactions"": """",

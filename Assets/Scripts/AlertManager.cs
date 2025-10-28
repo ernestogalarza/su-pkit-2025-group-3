@@ -9,6 +9,7 @@ public class AlertManager : MonoBehaviour
 
     [Header("References")]
     public GameObject visualPanel;  // Panel a mostrar u ocultar
+    public AudioSource alertAudio;   // Audio de alerta
 
     [Header("Settings")]
     public float speedThreshold = 60f;   // Límite de velocidad para mostrar alerta
@@ -23,14 +24,13 @@ public class AlertManager : MonoBehaviour
     void Start()
     {
         carController = GameObject.Find("CarDriverController").GetComponent<CarController>();
-        Time.timeScale = 1.0f;
     }
 
     // Update is called once per frame
     void Update()
     {
         float currentSpeed = carController.getCurrentSpeed();
-        Debug.Log($"Velocidad: {currentSpeed:F1} km/h");
+       // Debug.Log($"Velocidad: {currentSpeed:F1} km/h");
 
         UpdateAlert(carController.getCurrentSpeed());
     }
@@ -70,21 +70,27 @@ public class AlertManager : MonoBehaviour
 
     private void ShowAlert()
     {
+
         if (visualPanel != null)
-        {
             visualPanel.SetActive(true);
-            isAlertVisible = true;
-            Debug.Log("Alerta activada: velocidad superior a límite");
-        }
+
+        if (alertAudio != null && !alertAudio.isPlaying)
+            alertAudio.Play();
+
+
+        isAlertVisible = true;
+        Debug.Log("Alerta activada: velocidad superior a límite");
     }
 
     private void HideAlert()
     {
         if (visualPanel != null)
-        {
             visualPanel.SetActive(false);
-            isAlertVisible = false;
-            Debug.Log("Alerta desactivada: velocidad dentro del rango");
-        }
+
+        if (alertAudio != null && alertAudio.isPlaying)
+            alertAudio.Stop();
+
+        isAlertVisible = false;
+        Debug.Log("✅ Alerta desactivada: velocidad dentro del rango");
     }
 }

@@ -67,22 +67,6 @@ public class CarController : MonoBehaviour
         speedWithSteeringWheel();
     }
 
-    private void acceleratorArrowKey(float value) {
-
-        if (value > 0)
-        {
-            currentSpeed += acceleration * Time.deltaTime;
-        }
-    }
-
-    private void acceleratorSteeringWheel(float value)
-    {
-
-            currentSpeed += acceleration*Time.deltaTime * -value;
-
-            if(currentSpeed<0) currentSpeed= 0;
-    }
-
 
     void speedWithSteeringWheel() {
 
@@ -129,11 +113,15 @@ public class CarController : MonoBehaviour
         }
 
         // Mostrar datos en consola
-        Debug.Log($"Speed: {currentSpeed:F1} km/h | Throttle: {throttle:F2} | Brake: {brake:F2} | Wheel: {steeringInput:F2}");
+      //  Debug.Log($"Speed: {currentSpeed:F1} km/h | Throttle: {throttle:F2} | Brake: {brake:F2} | Wheel: {steeringInput:F2}");
 
         speedText.text = $"{currentSpeed:F1} km/h";
     }
 
+
+    public float getCurrentSpeed() {
+        return currentSpeed;
+    }
 
     
     

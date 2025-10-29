@@ -109,6 +109,15 @@ public partial class @VehicleControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Brake"",
+                    ""type"": ""Button"",
+                    ""id"": ""707eafc6-8926-4f7a-8b13-a65763ba2b46"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -177,6 +186,28 @@ public partial class @VehicleControls: IInputActionCollection2, IDisposable
                     ""action"": ""Throttle"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4514788e-bbf3-4d7e-9264-ca3520895c62"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Brake"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bcdf85da-45b4-41a3-bfe7-50ec045c84c2"",
+                    ""path"": ""<HID::44F B692>/stick/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Brake"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -187,6 +218,7 @@ public partial class @VehicleControls: IInputActionCollection2, IDisposable
         m_Vehicle = asset.FindActionMap("Vehicle", throwIfNotFound: true);
         m_Vehicle_Steering = m_Vehicle.FindAction("Steering", throwIfNotFound: true);
         m_Vehicle_Throttle = m_Vehicle.FindAction("Throttle", throwIfNotFound: true);
+        m_Vehicle_Brake = m_Vehicle.FindAction("Brake", throwIfNotFound: true);
     }
 
     ~@VehicleControls()
@@ -269,6 +301,7 @@ public partial class @VehicleControls: IInputActionCollection2, IDisposable
     private List<IVehicleActions> m_VehicleActionsCallbackInterfaces = new List<IVehicleActions>();
     private readonly InputAction m_Vehicle_Steering;
     private readonly InputAction m_Vehicle_Throttle;
+    private readonly InputAction m_Vehicle_Brake;
     /// <summary>
     /// Provides access to input actions defined in input action map "Vehicle".
     /// </summary>
@@ -288,6 +321,10 @@ public partial class @VehicleControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Vehicle/Throttle".
         /// </summary>
         public InputAction @Throttle => m_Wrapper.m_Vehicle_Throttle;
+        /// <summary>
+        /// Provides access to the underlying input action "Vehicle/Brake".
+        /// </summary>
+        public InputAction @Brake => m_Wrapper.m_Vehicle_Brake;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -320,6 +357,9 @@ public partial class @VehicleControls: IInputActionCollection2, IDisposable
             @Throttle.started += instance.OnThrottle;
             @Throttle.performed += instance.OnThrottle;
             @Throttle.canceled += instance.OnThrottle;
+            @Brake.started += instance.OnBrake;
+            @Brake.performed += instance.OnBrake;
+            @Brake.canceled += instance.OnBrake;
         }
 
         /// <summary>
@@ -337,6 +377,9 @@ public partial class @VehicleControls: IInputActionCollection2, IDisposable
             @Throttle.started -= instance.OnThrottle;
             @Throttle.performed -= instance.OnThrottle;
             @Throttle.canceled -= instance.OnThrottle;
+            @Brake.started -= instance.OnBrake;
+            @Brake.performed -= instance.OnBrake;
+            @Brake.canceled -= instance.OnBrake;
         }
 
         /// <summary>
@@ -391,5 +434,12 @@ public partial class @VehicleControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnThrottle(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Brake" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnBrake(InputAction.CallbackContext context);
     }
 }

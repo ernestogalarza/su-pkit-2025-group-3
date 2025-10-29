@@ -4,19 +4,19 @@ using System.Runtime.InteropServices;
 using SharpDX.DirectInput;
 using UnityEngine;
 
-public class SteeringWheelVibration : MonoBehaviour
+public class SteeringWheelVibration2 : MonoBehaviour
 {
     private DirectInput directInput;
     private Joystick steeringWheel;
     private EffectInfo constantForceEffect;
     private Effect currentEffect;
     private int[] actuatorAxes;
-    
+
     [Header("Speed Limit Settings")]
     public float speedLimit = 60f;
     public float vibrationIntensity = 0.7f; // 0.0 to 1.0
     public float vibrationDuration = 0.5f; // seconds
-    
+
     private Rigidbody vehicleRigidbody;
     private bool isOverSpeedLimit = false;
     private bool isVibrating = false;
@@ -24,12 +24,12 @@ public class SteeringWheelVibration : MonoBehaviour
     void Start()
     {
         vehicleRigidbody = GetComponent<Rigidbody>();
-        
-        #if !UNITY_EDITOR
+
+#if !UNITY_EDITOR
         InitializeSteeringWheel();
-        #else
+#else
         Debug.Log("ℹ️ SteeringWheelVibration is disabled in the editor (only works in build).");
-        #endif
+#endif
     }
 
     void InitializeSteeringWheel()
@@ -37,10 +37,10 @@ public class SteeringWheelVibration : MonoBehaviour
         try
         {
             directInput = new DirectInput();
-            
+
             // Search for Driving devices (steering wheel)
             var devices = directInput.GetDevices(SharpDX.DirectInput.DeviceType.Driving, DeviceEnumerationFlags.AllDevices);
-            
+
             if (devices.Count == 0)
             {
                 Debug.LogWarning("⚠️ No steering wheels detected in the system.");
@@ -53,10 +53,10 @@ public class SteeringWheelVibration : MonoBehaviour
             // Configure exclusive access (necessary for FFB)
             steeringWheel.SetCooperativeLevel(GetUnityWindowHandle(),
                 CooperativeLevel.Background | CooperativeLevel.Exclusive);
-            
+
             steeringWheel.Properties.BufferSize = 128;
             steeringWheel.Acquire();
-            
+
             Debug.Log($"Axes: {steeringWheel.Capabilities.AxeCount}, Buttons: {steeringWheel.Capabilities.ButtonCount}, POVs: {steeringWheel.Capabilities.PovCount}");
 
             // Get force feedback actuator axes
@@ -69,9 +69,9 @@ public class SteeringWheelVibration : MonoBehaviour
                     Debug.Log($"🎯 FFB Actuator found: {obj.Name}, ObjectId: {obj.ObjectId}");
                 }
             }
-            
+
             actuatorAxes = actuatorList.ToArray();
-            
+
             if (actuatorAxes.Length == 0)
             {
                 Debug.LogWarning("⚠️ No force feedback actuators found on this device.");
@@ -82,7 +82,7 @@ public class SteeringWheelVibration : MonoBehaviour
             foreach (var eff in steeringWheel.GetEffects())
             {
                 Debug.Log($"🎢 Effect GUID: {eff.Guid}, Type: {eff.Type}");
-                
+
                 if (eff.Guid == EffectGuid.ConstantForce)
                 {
                     constantForceEffect = eff;
@@ -116,7 +116,7 @@ public class SteeringWheelVibration : MonoBehaviour
     /// </summary>
     public void StartVibration(float intensity)
     {
-       
+
         if (steeringWheel == null || constantForceEffect.Guid == Guid.Empty || actuatorAxes == null || actuatorAxes.Length == 0)
         {
             Debug.LogWarning("⚠️ No steering wheel or effect available for vibration.");
@@ -131,7 +131,7 @@ public class SteeringWheelVibration : MonoBehaviour
         try
         {
             int magnitude = Mathf.Clamp((int)(intensity * 10000), 0, 10000);
-            
+
             // Create direction array matching the number of actuator axes
             var directions = new int[actuatorAxes.Length];
             for (int i = 0; i < directions.Length; i++)
@@ -157,11 +157,11 @@ public class SteeringWheelVibration : MonoBehaviour
 
             // Dispose previous effect if exists
             currentEffect?.Dispose();
-            
+
             // Create and start new effect
             currentEffect = new Effect(steeringWheel, constantForceEffect.Guid, parameters);
             currentEffect.Start(1);
-            
+
             isVibrating = true;
             Debug.Log($"✅ Vibration started with intensity {intensity:F2}");
         }
@@ -169,9 +169,9 @@ public class SteeringWheelVibration : MonoBehaviour
         {
             Debug.LogError($"⚠️ Error starting vibration: {ex.Message}\nStack: {ex.StackTrace}");
         }
-        
+
         Debug.Log("🧩 Vibration ignored (only works in build).");
-        
+
     }
 
     /// <summary>
@@ -179,7 +179,7 @@ public class SteeringWheelVibration : MonoBehaviour
     /// </summary>
     public void StopVibration()
     {
-        #if !UNITY_EDITOR
+#if !UNITY_EDITOR
         try
         {
             if (currentEffect != null)
@@ -196,12 +196,12 @@ public class SteeringWheelVibration : MonoBehaviour
         {
             Debug.LogWarning($"⚠️ Error stopping vibration: {ex.Message}");
         }
-        #endif
+#endif
     }
 
     void OnDestroy()
     {
-        #if !UNITY_EDITOR
+#if !UNITY_EDITOR
         try
         {
             StopVibration();
@@ -213,7 +213,7 @@ public class SteeringWheelVibration : MonoBehaviour
         {
             Debug.LogWarning($"⚠️ Error releasing resources: {ex.Message}");
         }
-        #endif
+#endif
     }
 
     [DllImport("user32.dll")]

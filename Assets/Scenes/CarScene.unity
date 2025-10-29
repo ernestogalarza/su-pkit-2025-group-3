@@ -73951,6 +73951,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlertManager
   visualPanel: {fileID: 1922903155}
   alertAudio: {fileID: 543958684}
+  steeringWheelVibration: {fileID: 0}
   speedThreshold: 60
   delayBeforeShow: 1
 --- !u!4 &757100494
@@ -186810,7 +186811,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1977713597}
-  - component: {fileID: 1977713596}
+  - component: {fileID: 1977713598}
   m_Layer: 0
   m_Name: SteeringWheelVibrationManager
   m_TagString: Untagged
@@ -186818,18 +186819,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!114 &1977713596
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1977713595}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47ebb15be11e78b4eb915e721c08e9fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SteeringWheelVibration
 --- !u!4 &1977713597
 Transform:
   m_ObjectHideFlags: 0
@@ -186845,6 +186834,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1977713598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1977713595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02f48ab99164a984993ccc7881ca20bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SteeringWheelVibration
+  vibrationIntensity: 0.7
+  vibrationDuration: 0.5
 --- !u!1 &1978076035
 GameObject:
   m_ObjectHideFlags: 0

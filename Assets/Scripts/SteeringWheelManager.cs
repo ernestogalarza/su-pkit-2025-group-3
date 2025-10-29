@@ -35,7 +35,7 @@ public class SteeringWheelManager : MonoBehaviour
         brake = controls.Vehicle.Brake.ReadValue<float>();
        // Debug.Log($"wheel//: {wheel:F2}");
         //     Debug.Log($"brake//: {brake:F2}");
-        Debug.Log($"throttle: {throttle:F2}");
+      //  Debug.Log($"throttle: {throttle:F2}");
         // speedText.text = throttle.ToString();
     }
 

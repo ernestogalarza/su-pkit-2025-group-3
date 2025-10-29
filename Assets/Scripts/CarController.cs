@@ -68,55 +68,57 @@ public class CarController : MonoBehaviour
     }
 
 
-    void speedWithSteeringWheel() {
+    void speedWithSteeringWheel()
+    {
+        steeringInput = steeringWheelManager.getWheelDirection();
+        throttleInput = steeringWheelManager.getThrottle();
+        brakeInput = steeringWheelManager.getBrake();
 
-        // Leer valores del volante y pedales
-        steeringInput = steeringWheelManager.getWheelDirection(); // -1 izquierda, 1 derecha
-        throttleInput = steeringWheelManager.getThrottle();       // -1 presionado, 1 libre
-        brakeInput = steeringWheelManager.getBrake();             // -1 presionado, 1 libre
-
-        // Normalizar acelerador: -1 (presionado) → 1 (acelera al máximo)
         float throttle = Mathf.InverseLerp(1f, -1f, throttleInput);
-
-        // Freno invertido: 0 presionado → 1, 1 sin presionar → 0
         float brake = 1f - brakeInput;
 
-        // Aplicar aceleración
+        // Calculate target speed
         currentSpeed += throttle * acceleration * Time.deltaTime;
-
-        // Aplicar freno
         currentSpeed -= brake * brakeForce * Time.deltaTime;
 
-        // Desaceleración por fricción cuando no se pisa throttle ni brake
         if (throttle <= 0f && brake <= 0f && currentSpeed > 0f)
         {
             currentSpeed -= friction * Time.deltaTime;
         }
 
-        // Limitar velocidad
         currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed);
 
-        // Mover el coche hacia adelante
-        transform.Translate(Vector3.forward * (currentSpeed / 3.6f) * Time.deltaTime);
+        // Apply velocity to Rigidbody
+        Vector3 targetVelocity = transform.forward * (currentSpeed / 3.6f);
+        rb.linearVelocity = new Vector3(targetVelocity.x, rb.linearVelocity.y, targetVelocity.z);
 
-        // Aplicar giro
+        // Steering
         float turn = steeringInput * turnSpeed * Time.deltaTime;
         transform.Rotate(Vector3.up, turn);
 
+        // Get ACTUAL speed from Rigidbody
+        float actualSpeed = rb.linearVelocity.magnitude * 3.6f;
+
+        // Update speedometer
         // Actualizar velocímetro
         if (speedometerNeedle != null)
         {
-            float needleZ = Mathf.Lerp(minRotationZ, maxRotationZ, currentSpeed / maxSpeedometerSpeed);
-            Vector3 rotation = speedometerNeedle.localEulerAngles;
-            rotation.z = needleZ;
-            speedometerNeedle.localEulerAngles = rotation;
+
+            // Clamp speed to speedometer range (0 to 240 km/h)
+            actualSpeed = Mathf.Clamp(actualSpeed, 0f, 240f);
+
+            // Map speed directly to rotation
+            // Formula: rotation = minRotation + (speed / maxSpeed) * (maxRotation - minRotation)
+            float speedRatio = actualSpeed / 240f; // 0 to 1 range
+            float needleZ = minRotationZ + speedRatio * (maxRotationZ - minRotationZ);
+
+            speedometerNeedle.localEulerAngles = new Vector3(0, 0, needleZ);
         }
 
-        // Mostrar datos en consola
-      //  Debug.Log($"Speed: {currentSpeed:F1} km/h | Throttle: {throttle:F2} | Brake: {brake:F2} | Wheel: {steeringInput:F2}");
+        speedText.text = $"{actualSpeed:F1} km/h";
 
-        speedText.text = $"{currentSpeed:F1} km/h";
     }
+
 
 
     public float getCurrentSpeed() {

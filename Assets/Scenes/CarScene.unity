@@ -69692,7 +69692,7 @@ MonoBehaviour:
   speedometerNeedle: {fileID: 370925099}
   speedText: {fileID: 1963629579}
   minSpeed: 0
-  maxSpeedometerSpeed: 240
+  maxSpeedometerSpeed: 106
   minRotationZ: 0
   maxRotationZ: -280
 --- !u!4 &710510501 stripped

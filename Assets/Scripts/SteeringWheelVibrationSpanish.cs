@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using SharpDX.DirectInput;
 using UnityEngine;
 
-public class SteeringWheelVibration : MonoBehaviour
+public class SteeringWheelVibrationSpanish : MonoBehaviour
 {
     private DirectInput directInput;
     private Joystick steeringWheel;

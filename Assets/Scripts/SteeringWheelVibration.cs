@@ -32,29 +32,6 @@ public class SteeringWheelVibration : MonoBehaviour
         InitializeSteeringWheel();
     }
 
-    void Update()
-    {
-        // Test vibration with V key
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            Debug.Log("🔑 V key pressed - Testing BOING vibration");
-            TestVibration();
-        }
-
-        // Stop vibration with B key
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            Debug.Log("🔑 B key pressed - Stopping vibration");
-            StopVibration();
-        }
-
-        // Cycle through effect types with N key
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            CycleEffectType();
-        }
-    }
-
     void InitializeSteeringWheel()
     {
         try
@@ -92,32 +69,12 @@ public class SteeringWheelVibration : MonoBehaviour
                 return;
             }
 
-            // List all available effects
-            Debug.Log("📋 Available force feedback effects:");
-            foreach (var eff in steeringWheel.GetEffects())
-            {
-                Debug.Log($"   - {eff.Name} (GUID: {eff.Guid})");
-            }
-
             Debug.Log("✅ Force feedback initialization complete!");
         }
         catch (Exception ex)
         {
             Debug.LogError($"❌ Error initializing the steering wheel: {ex.Message}\nStack: {ex.StackTrace}");
         }
-    }
-
-    void CycleEffectType()
-    {
-        int currentIndex = (int)effectType;
-        currentIndex = (currentIndex + 1) % 5;
-        effectType = (EffectType)currentIndex;
-        Debug.Log($"🔄 Switched to effect type: {effectType}");
-    }
-
-    public void TestVibration()
-    {
-        StartVibration(vibrationIntensity);
     }
 
     public void StartVibration(float intensity)
@@ -136,7 +93,7 @@ public class SteeringWheelVibration : MonoBehaviour
 
         if (isVibrating)
         {
-            Debug.Log("🔄 Already vibrating, stopping current effect first...");
+            Debug.Log("🔄 Already vibrating, restarting with new parameters...");
             StopVibration();
         }
 
@@ -145,7 +102,7 @@ public class SteeringWheelVibration : MonoBehaviour
             Guid effectGuid = GetEffectGuid(effectType);
             
             int magnitude = Mathf.Clamp((int)(intensity * 10000), 0, 10000);
-            Debug.Log($"🎮 Creating {effectType} vibration effect with magnitude: {magnitude}, frequency: {vibrationFrequency} Hz");
+            Debug.Log($"🎮 Creating {effectType} vibration with magnitude: {magnitude}, frequency: {vibrationFrequency} Hz");
 
             var directions = new int[actuatorAxes.Length];
             for (int i = 0; i < directions.Length; i++)
@@ -163,7 +120,7 @@ public class SteeringWheelVibration : MonoBehaviour
             var parameters = new EffectParameters
             {
                 Flags = EffectFlags.Cartesian | EffectFlags.ObjectIds,
-                Duration = int.MaxValue, // Infinite duration
+                Duration = int.MaxValue, // Infinite duration until stopped
                 Gain = 10000,
                 SamplePeriod = 0,
                 TriggerButton = -1,
@@ -215,10 +172,6 @@ public class SteeringWheelVibration : MonoBehaviour
                 currentEffect.Dispose();
                 currentEffect = null;
                 Debug.Log("🛑 Vibration stopped.");
-            }
-            else
-            {
-                Debug.Log("ℹ️ No active vibration to stop.");
             }
             isVibrating = false;
         }

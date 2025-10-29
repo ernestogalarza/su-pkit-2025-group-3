@@ -20,6 +20,12 @@ public class AlertManager : MonoBehaviour
     void Start()
     {
         carController = GameObject.Find("CarDriverController").GetComponent<CarController>();
+        
+        // Verify references
+        if (steeringWheelVibration == null)
+        {
+            Debug.LogWarning("⚠️ SteeringWheelVibration reference is not assigned in AlertManager!");
+        }
     }
 
     void Update()
@@ -63,29 +69,39 @@ public class AlertManager : MonoBehaviour
     {
         if (visualPanel != null)
             visualPanel.SetActive(true);
+        
         if (alertAudio != null && !alertAudio.isPlaying)
             alertAudio.Play();
 
         // Activar vibración del volante
         if (steeringWheelVibration != null)
+        {
             steeringWheelVibration.StartVibration(steeringWheelVibration.vibrationIntensity);
+            Debug.Log("🚨 Alerta activada: velocidad superior a límite + vibración iniciada");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ SteeringWheelVibration component not assigned!");
+        }
 
         isAlertVisible = true;
-        Debug.Log("🚨 Alerta activada: velocidad superior a límite + vibración iniciada");
     }
 
     private void HideAlert()
     {
         if (visualPanel != null)
             visualPanel.SetActive(false);
+        
         if (alertAudio != null && alertAudio.isPlaying)
             alertAudio.Stop();
 
         // Detener vibración del volante
         if (steeringWheelVibration != null)
+        {
             steeringWheelVibration.StopVibration();
+            Debug.Log("✅ Alerta desactivada: velocidad dentro del rango + vibración detenida");
+        }
 
         isAlertVisible = false;
-        Debug.Log("✅ Alerta desactivada: velocidad dentro del rango + vibración detenida");
     }
 }

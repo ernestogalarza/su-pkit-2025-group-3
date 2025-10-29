@@ -35,6 +35,14 @@ public class ThrustmasterForceFeedbackManager : MonoBehaviour
                 steeringWheel = new Joystick(directInput, deviceInstance.InstanceGuid);
                 steeringWheel.Acquire();
                 Debug.Log($"✅ Volante detectado: {deviceInstance.InstanceName}");
+                // 🔍 Aquí colocas la línea que te interesa
+                Debug.Log("Axes: " + steeringWheel.Capabilities.AxeCount);
+
+                // También puedes imprimir otros datos útiles
+                Debug.Log("Botones: " + steeringWheel.Capabilities.ButtonCount);
+                Debug.Log("POVs: " + steeringWheel.Capabilities.PovCount);
+
+
                 break;
             }
         }
@@ -47,7 +55,8 @@ public class ThrustmasterForceFeedbackManager : MonoBehaviour
 
         foreach (var effectInfo in steeringWheel.GetEffects())
         {
-            Debug.Log("Effect: " + effectInfo.Type);
+            //Debug.Log("Effect: " + effectInfo.Type);
+            Debug.Log($"🎢 Effect GUID: {effectInfo.Guid}, Type: {effectInfo.Type}");
 
             if (effectInfo.Type.HasFlag(EffectType.ConstantForce))
             {
@@ -101,6 +110,7 @@ public class ThrustmasterForceFeedbackManager : MonoBehaviour
         }
         catch (System.Exception ex)
         {
+
             Debug.LogError($"⚠️ Error al iniciar vibración: {ex.Message}");
         }
     }

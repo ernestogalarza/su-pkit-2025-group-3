@@ -186818,7 +186818,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1977713597
 Transform:
   m_ObjectHideFlags: 0
@@ -186846,8 +186846,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02f48ab99164a984993ccc7881ca20bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SteeringWheelVibration
-  vibrationIntensity: 0.7
-  vibrationDuration: 0.5
+  vibrationIntensity: 0.08
+  vibrationFrequency: 50
+  effectType: 0
 --- !u!1 &1978076035
 GameObject:
   m_ObjectHideFlags: 0

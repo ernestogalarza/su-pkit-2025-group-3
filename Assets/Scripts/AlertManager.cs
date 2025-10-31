@@ -17,6 +17,10 @@ public class AlertManager : MonoBehaviour
     private bool isAlertVisible = false;
     private Coroutine alertCoroutine;
 
+    public void setSpeedAlert(float newSpeed) {
+        speedThreshold = newSpeed;
+    }
+
     void Start()
     {
         carController = GameObject.Find("CarDriverController").GetComponent<CarController>();

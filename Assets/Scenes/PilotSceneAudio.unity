@@ -7020,6 +7020,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
   newSpeed: 80
+  speedText: {fileID: 1963629579}
 --- !u!65 &129304550
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -24589,7 +24590,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!82 &543958684
 AudioSource:
   m_ObjectHideFlags: 0
@@ -28229,6 +28230,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
   newSpeed: 80
+  speedText: {fileID: 1963629579}
 --- !u!65 &626385338
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -30172,10 +30174,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
   handlerKeyboard: 0
-  acceleration: 30
-  brakeForce: 100
-  friction: 10
-  maxSpeed: 360
+  acceleration: 20
+  brakeForce: 40
+  friction: 20
+  maxSpeed: 150
   turnSpeed: 200
   speedometerNeedle: {fileID: 370925099}
   speedText: {fileID: 1963629579}
@@ -34502,6 +34504,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
   newSpeed: 50
+  speedText: {fileID: 1963629579}
 --- !u!65 &871962350
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -41422,6 +41425,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
   newSpeed: 30
+  speedText: {fileID: 1963629579}
 --- !u!65 &1015579871
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -49375,6 +49379,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
   newSpeed: 30
+  speedText: {fileID: 0}
 --- !u!1 &1200330128
 GameObject:
   m_ObjectHideFlags: 0
@@ -52783,6 +52788,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
   newSpeed: 80
+  speedText: {fileID: 1963629579}
 --- !u!65 &1284672432
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -78307,6 +78313,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
   newSpeed: 40
+  speedText: {fileID: 1963629579}
 --- !u!65 &1857771660
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -81715,8 +81722,8 @@ Transform:
   m_GameObject: {fileID: 1922903155}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.42385, y: 1.13923, z: 0.6823}
-  m_LocalScale: {x: 0.058879595, y: 0.12685253, z: 0.005}
+  m_LocalPosition: {x: -0.4467, y: 1.0834, z: 0.6823}
+  m_LocalScale: {x: 0.01967788, y: 0.017363379, z: 0.0024689499}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1958580273}
@@ -83140,7 +83147,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 7, y: -404}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1963629579
@@ -83163,7 +83170,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 0 km
+  m_text: 80
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -83190,8 +83197,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 90
-  m_fontSizeBase: 90
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -83519,7 +83526,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1977713597
 Transform:
   m_ObjectHideFlags: 0
@@ -83547,7 +83554,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02f48ab99164a984993ccc7881ca20bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SteeringWheelVibration
-  vibrationIntensity: 0.12
+  vibrationIntensity: 0.5
   vibrationFrequency: 50
   effectType: 0
 --- !u!1 &1977753884
@@ -85342,6 +85349,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
   newSpeed: 40
+  speedText: {fileID: 1963629579}
 --- !u!65 &2017439773
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -90643,6 +90651,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
   newSpeed: 80
+  speedText: {fileID: 1963629579}
 --- !u!65 &2108491399
 BoxCollider:
   m_ObjectHideFlags: 0

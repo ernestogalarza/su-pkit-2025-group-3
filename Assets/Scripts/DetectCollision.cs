@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 
 public class DetectCollision : MonoBehaviour
 {
     private AlertManager alertManager;
     public float newSpeed;
+    public TextMeshProUGUI speedText;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -23,6 +25,7 @@ public class DetectCollision : MonoBehaviour
 
         Debug.Log($"🚀 Change speed Alert To  {newSpeed}");
         alertManager.setSpeedAlert(newSpeed);
+        speedText.text = $"{newSpeed:F0}";
     }
 
 

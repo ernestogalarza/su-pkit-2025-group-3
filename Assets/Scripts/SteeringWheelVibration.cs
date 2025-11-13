@@ -41,12 +41,12 @@ public class SteeringWheelVibration : MonoBehaviour
             
             if (devices.Count == 0)
             {
-                Debug.LogWarning("⚠️ No steering wheels detected in the system.");
+                //Debug.LogWarning("⚠️ No steering wheels detected in the system.");
                 return;
             }
 
             steeringWheel = new Joystick(directInput, devices[0].InstanceGuid);
-            Debug.Log($"✅ Steering wheel detected: {devices[0].InstanceName}");
+            //Debug.Log($"✅ Steering wheel detected: {devices[0].InstanceName}");
 
             steeringWheel.SetCooperativeLevel(GetUnityWindowHandle(), CooperativeLevel.Background | CooperativeLevel.Exclusive);
             steeringWheel.Properties.BufferSize = 128;
@@ -58,22 +58,22 @@ public class SteeringWheelVibration : MonoBehaviour
                 if (obj.ObjectId.Flags.HasFlag(DeviceObjectTypeFlags.ForceFeedbackActuator))
                 {
                     actuatorList.Add((int)obj.ObjectId);
-                    Debug.Log($"🎯 Found force feedback actuator: {obj.Name} (ID: {obj.ObjectId})");
+                //    Debug.Log($"🎯 Found force feedback actuator: {obj.Name} (ID: {obj.ObjectId})");
                 }
             }
             actuatorAxes = actuatorList.ToArray();
 
             if (actuatorAxes.Length == 0)
             {
-                Debug.LogWarning("⚠️ No force feedback actuators found on this device.");
+            //    Debug.LogWarning("⚠️ No force feedback actuators found on this device.");
                 return;
             }
 
-            Debug.Log("✅ Force feedback initialization complete!");
+           // Debug.Log("✅ Force feedback initialization complete!");
         }
         catch (Exception ex)
         {
-            Debug.LogError($"❌ Error initializing the steering wheel: {ex.Message}\nStack: {ex.StackTrace}");
+           // Debug.LogError($"❌ Error initializing the steering wheel: {ex.Message}\nStack: {ex.StackTrace}");
         }
     }
 
@@ -81,19 +81,19 @@ public class SteeringWheelVibration : MonoBehaviour
     {
         if (steeringWheel == null)
         {
-            Debug.LogWarning("⚠️ Steering wheel not initialized.");
+           // Debug.LogWarning("⚠️ Steering wheel not initialized.");
             return;
         }
 
         if (actuatorAxes == null || actuatorAxes.Length == 0)
         {
-            Debug.LogWarning("⚠️ No force feedback actuators available.");
+           // Debug.LogWarning("⚠️ No force feedback actuators available.");
             return;
         }
 
         if (isVibrating)
         {
-            Debug.Log("🔄 Already vibrating, restarting with new parameters...");
+           // Debug.Log("🔄 Already vibrating, restarting with new parameters...");
             StopVibration();
         }
 
@@ -102,7 +102,7 @@ public class SteeringWheelVibration : MonoBehaviour
             Guid effectGuid = GetEffectGuid(effectType);
             
             int magnitude = Mathf.Clamp((int)(intensity * 10000), 0, 10000);
-            Debug.Log($"🎮 Creating {effectType} vibration with magnitude: {magnitude}, frequency: {vibrationFrequency} Hz");
+           // Debug.Log($"🎮 Creating {effectType} vibration with magnitude: {magnitude}, frequency: {vibrationFrequency} Hz");
 
             var directions = new int[actuatorAxes.Length];
             for (int i = 0; i < directions.Length; i++)
@@ -135,7 +135,7 @@ public class SteeringWheelVibration : MonoBehaviour
             currentEffect = new Effect(steeringWheel, effectGuid, parameters);
             currentEffect.Start(1);
             isVibrating = true;
-            Debug.Log($"✅ {effectType} vibration started successfully!");
+          //  Debug.Log($"✅ {effectType} vibration started successfully!");
         }
         catch (Exception ex)
         {
@@ -171,7 +171,7 @@ public class SteeringWheelVibration : MonoBehaviour
                 currentEffect.Stop();
                 currentEffect.Dispose();
                 currentEffect = null;
-                Debug.Log("🛑 Vibration stopped.");
+               // Debug.Log("🛑 Vibration stopped.");
             }
             isVibrating = false;
         }

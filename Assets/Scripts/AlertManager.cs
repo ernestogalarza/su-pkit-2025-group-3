@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class AlertManager : MonoBehaviour
 {
@@ -17,6 +18,10 @@ public class AlertManager : MonoBehaviour
     private bool isAlertVisible = false;
     private Coroutine alertCoroutine;
 
+    private int idAlert = 1;
+    private DateTime startAlert;
+    private DateTime endAlert;
+
     public void setSpeedAlert(float newSpeed) {
         speedThreshold = newSpeed;
     }
@@ -28,7 +33,7 @@ public class AlertManager : MonoBehaviour
         // Verify references
         if (steeringWheelVibration == null)
         {
-            Debug.LogWarning("⚠️ SteeringWheelVibration reference is not assigned in AlertManager!");
+           // Debug.LogWarning("⚠️ SteeringWheelVibration reference is not assigned in AlertManager!");
         }
     }
 
@@ -62,10 +67,11 @@ public class AlertManager : MonoBehaviour
 
     private IEnumerator ShowAfterDelay()
     {
-        Debug.Log($"🚀 Coroutine iniciada a tiempo {Time.time}");
+      //  Debug.Log($"🚀 Coroutine iniciada a tiempo {Time.time}");
         yield return new WaitForSeconds(delayBeforeShow);
-        Debug.Log($"⏰ Mostrando alerta a tiempo {Time.time}");
+     //   Debug.Log($"⏰ Mostrando alerta a tiempo {Time.time}");
         ShowAlert();
+        startAlert = DateTime.Now;
         alertCoroutine = null;
     }
 
@@ -81,11 +87,11 @@ public class AlertManager : MonoBehaviour
         if (steeringWheelVibration != null)
         {
             steeringWheelVibration.StartVibration(steeringWheelVibration.vibrationIntensity);
-            Debug.Log("🚨 Alerta activada: velocidad superior a límite + vibración iniciada");
+           // Debug.Log("🚨 Alerta activada: velocidad superior a límite + vibración iniciada");
         }
         else
         {
-            Debug.LogWarning("⚠️ SteeringWheelVibration component not assigned!");
+           // Debug.LogWarning("⚠️ SteeringWheelVibration component not assigned!");
         }
 
         isAlertVisible = true;
@@ -103,9 +109,37 @@ public class AlertManager : MonoBehaviour
         if (steeringWheelVibration != null)
         {
             steeringWheelVibration.StopVibration();
-            Debug.Log("✅ Alerta desactivada: velocidad dentro del rango + vibración detenida");
+           // Debug.Log("✅ Alerta desactivada: velocidad dentro del rango + vibración detenida");
         }
 
+
+       // idAlert++;
+
+        endAlert = DateTime.Now;
+
         isAlertVisible = false;
+    }
+
+    public bool getIsAlertVisible() {
+       return  isAlertVisible;
+    }
+
+    public int getIdAlert() {
+        return idAlert;
+    }
+
+    public DateTime getTimeStartAlert()
+    {
+        return startAlert;
+    }
+
+    public DateTime getTimeEndAlert()
+    {
+        return endAlert;
+    }
+
+    public void setIdAlert(int id)
+    {
+         idAlert = id;
     }
 }

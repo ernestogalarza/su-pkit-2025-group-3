@@ -7,6 +7,9 @@ using UnityEngine.InputSystem.Controls;
 public class SteeringWheelManager : MonoBehaviour
 {
 
+    public TextMeshProUGUI speedText;               // Referencia al texto en la UI (opcional)
+
+
     private VehicleControls controls;
    // public TextMeshProUGUI speedText;
     private float wheel;
@@ -33,10 +36,12 @@ public class SteeringWheelManager : MonoBehaviour
         wheel = controls.Vehicle.Steering.ReadValue<float>();
         throttle = controls.Vehicle.Throttle.ReadValue<float>();
         brake = controls.Vehicle.Brake.ReadValue<float>();
-       // Debug.Log($"wheel//: {wheel:F2}");
+        // Debug.Log($"wheel//: {wheel:F2}");
         //     Debug.Log($"brake//: {brake:F2}");
-      //  Debug.Log($"throttle: {throttle:F2}");
+        //  Debug.Log($"throttle: {throttle:F2}");
         // speedText.text = throttle.ToString();
+
+        speedText.text = $"{throttle:F1}";
     }
 
     public float getWheelDirection()

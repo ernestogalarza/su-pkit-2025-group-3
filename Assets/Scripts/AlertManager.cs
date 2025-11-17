@@ -17,34 +17,77 @@ public class AlertManager : MonoBehaviour
 
     private bool isAlertVisible = false;
     private Coroutine alertCoroutine;
-
     private int idAlert = 1;
     private DateTime startAlert;
     private DateTime endAlert;
 
-    public void setSpeedAlert(float newSpeed) {
+    // NEW: Flag to enable/disable the alert system
+    private bool isAlertActive = true;
+
+    public void setSpeedAlert(float newSpeed)
+    {
         speedThreshold = newSpeed;
+    }
+
+    /// <summary>
+    /// Disables the speed alert system (for No Rules signs)
+    /// </summary>
+    public void DisableSpeedAlert()
+    {
+        isAlertActive = false;
+
+        // Hide current alert if visible
+        if (isAlertVisible)
+        {
+            HideAlert();
+        }
+
+        // Stop any pending alert coroutine
+        if (alertCoroutine != null)
+        {
+            StopCoroutine(alertCoroutine);
+            alertCoroutine = null;
+        }
+
+        Debug.Log("🚫 Speed alerts DISABLED - No speed limit enforcement");
+    }
+
+    /// <summary>
+    /// Re-enables the speed alert system
+    /// </summary>
+    public void EnableSpeedAlert()
+    {
+        isAlertActive = true;
+        Debug.Log("✅ Speed alerts ENABLED - Speed limit enforcement active");
     }
 
     void Start()
     {
         carController = GameObject.Find("CarDriverController").GetComponent<CarController>();
-        
+
         // Verify references
         if (steeringWheelVibration == null)
         {
-           // Debug.LogWarning("⚠️ SteeringWheelVibration reference is not assigned in AlertManager!");
+            // Debug.LogWarning("⚠️ SteeringWheelVibration reference is not assigned in AlertManager!");
         }
     }
 
     void Update()
     {
+        // Only run alert logic if system is active
+        if (!isAlertActive)
+            return;
+
         float currentSpeed = carController.getCurrentSpeed();
         UpdateAlert(currentSpeed);
     }
 
     public void UpdateAlert(float currentSpeed)
     {
+        // Only check speed if alerts are enabled
+        if (!isAlertActive)
+            return;
+
         if (currentSpeed > speedThreshold + 1f)
         {
             // Si supera el límite y no se ha mostrado aún, iniciar temporizador
@@ -60,6 +103,7 @@ public class AlertManager : MonoBehaviour
                 StopCoroutine(alertCoroutine);
                 alertCoroutine = null;
             }
+
             if (isAlertVisible)
                 HideAlert();
         }
@@ -67,9 +111,9 @@ public class AlertManager : MonoBehaviour
 
     private IEnumerator ShowAfterDelay()
     {
-      //  Debug.Log($"🚀 Coroutine iniciada a tiempo {Time.time}");
+        // Debug.Log($"🚀 Coroutine iniciada a tiempo {Time.time}");
         yield return new WaitForSeconds(delayBeforeShow);
-     //   Debug.Log($"⏰ Mostrando alerta a tiempo {Time.time}");
+        // Debug.Log($"⏰ Mostrando alerta a tiempo {Time.time}");
         ShowAlert();
         startAlert = DateTime.Now;
         alertCoroutine = null;
@@ -79,7 +123,7 @@ public class AlertManager : MonoBehaviour
     {
         if (visualPanel != null)
             visualPanel.SetActive(true);
-        
+
         if (alertAudio != null && !alertAudio.isPlaying)
             alertAudio.Play();
 
@@ -87,11 +131,11 @@ public class AlertManager : MonoBehaviour
         if (steeringWheelVibration != null)
         {
             steeringWheelVibration.StartVibration(steeringWheelVibration.vibrationIntensity);
-           // Debug.Log("🚨 Alerta activada: velocidad superior a límite + vibración iniciada");
+            // Debug.Log("🚨 Alerta activada: velocidad superior a límite + vibración iniciada");
         }
         else
         {
-           // Debug.LogWarning("⚠️ SteeringWheelVibration component not assigned!");
+            // Debug.LogWarning("⚠️ SteeringWheelVibration component not assigned!");
         }
 
         isAlertVisible = true;
@@ -101,7 +145,7 @@ public class AlertManager : MonoBehaviour
     {
         if (visualPanel != null)
             visualPanel.SetActive(false);
-        
+
         if (alertAudio != null && alertAudio.isPlaying)
             alertAudio.Stop();
 
@@ -109,22 +153,21 @@ public class AlertManager : MonoBehaviour
         if (steeringWheelVibration != null)
         {
             steeringWheelVibration.StopVibration();
-           // Debug.Log("✅ Alerta desactivada: velocidad dentro del rango + vibración detenida");
+            // Debug.Log("✅ Alerta desactivada: velocidad dentro del rango + vibración detenida");
         }
 
-
-       // idAlert++;
-
+        // idAlert++;
         endAlert = DateTime.Now;
-
         isAlertVisible = false;
     }
 
-    public bool getIsAlertVisible() {
-       return  isAlertVisible;
+    public bool getIsAlertVisible()
+    {
+        return isAlertVisible;
     }
 
-    public int getIdAlert() {
+    public int getIdAlert()
+    {
         return idAlert;
     }
 
@@ -140,6 +183,11 @@ public class AlertManager : MonoBehaviour
 
     public void setIdAlert(int id)
     {
-         idAlert = id;
+        idAlert = id;
+    }
+
+    public bool IsAlertSystemActive()
+    {
+        return isAlertActive;
     }
 }

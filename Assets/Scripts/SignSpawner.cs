@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class SignSpawner : MonoBehaviour
@@ -13,10 +14,18 @@ public class SignSpawner : MonoBehaviour
     [System.Serializable]
     public class SpawnLocation
     {
-        public Transform triggerWall; // The invisible wall trigger
-        public Vector3 spawnPosition; // Where to spawn the sign
-        public Vector3 spawnRotation; // Rotation in degrees (X, Y, Z)
-        public Vector3 spawnScale; // Scale (X, Y, Z)
+        public Transform triggerWall; // The initial invisible wall trigger
+        [Space]
+        [Header("Sign Spawn Settings")]
+        public Vector3 signSpawnPosition; // Where to spawn the sign
+        public Vector3 signSpawnRotation; // Rotation in degrees (X, Y, Z)
+        public Vector3 signSpawnScale; // Scale (X, Y, Z)
+        [Space]
+        [Header("Alert Wall Spawn Settings")]
+        public Vector3 alertWallSpawnPosition; // Where to spawn the alert trigger wall
+        public Vector3 alertWallSpawnRotation; // Rotation in degrees (X, Y, Z)
+        public Vector3 alertWallSpawnScale; // Scale (X, Y, Z)
+        [Space]
         public string locationName; // For debugging (e.g., "Wall 1", "Wall 2")
     }
 
@@ -26,14 +35,23 @@ public class SignSpawner : MonoBehaviour
     [Header("Spawn Locations")]
     public List<SpawnLocation> spawnLocations = new List<SpawnLocation>();
 
+    [Header("Alert Wall Prefab")]
+    public GameObject alertWallPrefab; // Prefab for the invisible alert trigger wall
+
+    [Header("Alert Settings")]
+    public float alertDelay = 0.2f; // Delay before triggering alert after passing wall
+
     private CarController carController;
+    private AlertManager alertManager;
     private Dictionary<Transform, GameObject> activeSignsByLocation = new Dictionary<Transform, GameObject>();
+    private Dictionary<Transform, GameObject> activeAlertWallsByLocation = new Dictionary<Transform, GameObject>();
 
     void Start()
     {
         Debug.Log("=== SignSpawner Started ===");
 
         carController = GameObject.Find("CarDriverController").GetComponent<CarController>();
+        alertManager = GameObject.Find("AlertManager").GetComponent<AlertManager>();
 
         if (carController == null)
         {
@@ -41,7 +59,13 @@ public class SignSpawner : MonoBehaviour
             return;
         }
 
-        Debug.Log("✅ CarController found");
+        if (alertManager == null)
+        {
+            Debug.LogError("❌ AlertManager not found!");
+            return;
+        }
+
+        Debug.Log("✅ CarController and AlertManager found");
 
         if (speedLimitSigns.Count == 0)
         {
@@ -58,6 +82,11 @@ public class SignSpawner : MonoBehaviour
                 Debug.LogError($"❌ Speed limit sign {sign.speedLimit} km/h has no prefab assigned!");
             else
                 Debug.Log($"✅ Speed limit sign {sign.speedLimit} km/h assigned");
+        }
+
+        if (alertWallPrefab == null)
+        {
+            Debug.LogWarning("⚠️ Alert wall prefab not assigned! Creating default cube.");
         }
 
         if (spawnLocations.Count == 0)
@@ -127,7 +156,7 @@ public class SignSpawner : MonoBehaviour
 
         if (selectedSign == null)
         {
-            Debug.LogWarning("⚠️  No suitable speed limit sign found!");
+            Debug.LogWarning("⚠️ No suitable speed limit sign found!");
             return;
         }
 
@@ -142,20 +171,70 @@ public class SignSpawner : MonoBehaviour
         {
             Destroy(activeSignsByLocation[location.triggerWall]);
             activeSignsByLocation.Remove(location.triggerWall);
-            Debug.Log($"🗑️  Old sign destroyed");
+            Debug.Log($"🗑️ Old sign destroyed");
         }
 
-        Debug.Log($"🎯 Spawning {selectedSign.speedLimit} km/h sign at {location.spawnPosition} with rotation {location.spawnRotation} and scale {location.spawnScale}");
+        // Destroy previous alert wall at this location if exists
+        if (activeAlertWallsByLocation.ContainsKey(location.triggerWall))
+        {
+            Destroy(activeAlertWallsByLocation[location.triggerWall]);
+            activeAlertWallsByLocation.Remove(location.triggerWall);
+            Debug.Log($"🗑️ Old alert wall destroyed");
+        }
+
+        Debug.Log($"🎯 Spawning {selectedSign.speedLimit} km/h sign at {location.signSpawnPosition}");
 
         // Spawn the sign at the configured position
-        GameObject newSign = Instantiate(selectedSign.signPrefab, location.spawnPosition, Quaternion.Euler(location.spawnRotation));
-
-        // Apply scale
-        newSign.transform.localScale = location.spawnScale;
-
+        GameObject newSign = Instantiate(selectedSign.signPrefab, location.signSpawnPosition, Quaternion.Euler(location.signSpawnRotation));
+        newSign.transform.localScale = location.signSpawnScale;
         activeSignsByLocation[location.triggerWall] = newSign;
 
-        Debug.Log($"✅ {selectedSign.speedLimit} km/h sign spawned successfully at {location.spawnPosition}!");
+        Debug.Log($"✅ {selectedSign.speedLimit} km/h sign spawned successfully!");
+
+        // Spawn the alert trigger wall
+        SpawnAlertWall(location, selectedSign.speedLimit);
+    }
+
+    private void SpawnAlertWall(SpawnLocation location, int speedLimit)
+    {
+        GameObject alertWall;
+
+        if (alertWallPrefab != null)
+        {
+            // Use the prefab
+            alertWall = Instantiate(alertWallPrefab, location.alertWallSpawnPosition, Quaternion.Euler(location.alertWallSpawnRotation));
+        }
+        else
+        {
+            // Create a default cube if no prefab assigned
+            alertWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            alertWall.transform.position = location.alertWallSpawnPosition;
+            alertWall.transform.rotation = Quaternion.Euler(location.alertWallSpawnRotation);
+
+            // Make it invisible (remove mesh renderer)
+            MeshRenderer renderer = alertWall.GetComponent<MeshRenderer>();
+            if (renderer != null)
+                Destroy(renderer);
+        }
+
+        alertWall.transform.localScale = location.alertWallSpawnScale;
+        alertWall.name = $"AlertWall_{speedLimit}kmh_{location.locationName}";
+
+        // Ensure it has a trigger collider
+        Collider collider = alertWall.GetComponent<Collider>();
+        if (collider == null)
+        {
+            collider = alertWall.AddComponent<BoxCollider>();
+        }
+        collider.isTrigger = true;
+
+        // Add the alert trigger detector component
+        AlertWallDetector alertDetector = alertWall.AddComponent<AlertWallDetector>();
+        alertDetector.SetAlertSettings(carController, alertManager, speedLimit, alertDelay);
+
+        activeAlertWallsByLocation[location.triggerWall] = alertWall;
+
+        Debug.Log($"✅ Alert wall spawned at {location.alertWallSpawnPosition} with speed limit {speedLimit} km/h");
     }
 
     /// <summary>
@@ -195,7 +274,7 @@ public class SignSpawner : MonoBehaviour
     }
 }
 
-// Helper component for each trigger wall
+// Helper component for the initial trigger walls
 public class TriggerWallDetector : MonoBehaviour
 {
     private SignSpawner spawner;
@@ -224,7 +303,53 @@ public class TriggerWallDetector : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"⚠️  Collider '{other.name}' doesn't match vehicle detection");
+            Debug.LogWarning($"⚠️ Collider '{other.name}' doesn't match vehicle detection");
+        }
+    }
+}
+
+// Component for dynamically spawned alert trigger walls
+public class AlertWallDetector : MonoBehaviour
+{
+    private CarController carController;
+    private AlertManager alertManager;
+    private int speedLimit;
+    private float alertDelay;
+
+    public void SetAlertSettings(CarController car, AlertManager alert, int limit, float delay)
+    {
+        carController = car;
+        alertManager = alert;
+        speedLimit = limit;
+        alertDelay = delay;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log($"🚨 Alert wall triggered by: {other.name}");
+
+        // Check if it's the car
+        CarController car = other.GetComponent<CarController>();
+        if (car == null)
+            car = other.GetComponentInParent<CarController>();
+
+        if (car != null || other.name == "ColliderBody")
+        {
+            Debug.Log($"✅ Car detected! Setting speed threshold to {speedLimit} km/h with {alertDelay}s delay");
+
+            // Update the alert manager's speed threshold
+            StartCoroutine(UpdateAlertAfterDelay());
+        }
+    }
+
+    private IEnumerator UpdateAlertAfterDelay()
+    {
+        yield return new WaitForSeconds(alertDelay);
+
+        if (alertManager != null)
+        {
+            alertManager.setSpeedAlert(speedLimit);
+            Debug.Log($"⚠️ Alert threshold updated to {speedLimit} km/h after {alertDelay}s delay");
         }
     }
 }

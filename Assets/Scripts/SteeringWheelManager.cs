@@ -11,7 +11,6 @@ public class SteeringWheelManager : MonoBehaviour
 
 
     private VehicleControls controls;
-   // public TextMeshProUGUI speedText;
     private float wheel;
     private float throttle;
     private float brake;
@@ -41,7 +40,7 @@ public class SteeringWheelManager : MonoBehaviour
         //  Debug.Log($"throttle: {throttle:F2}");
         // speedText.text = throttle.ToString();
 
-        speedText.text = $"{throttle:F1}";
+       // speedText.text = $"{throttle:F1}";
     }
 
     public float getWheelDirection()

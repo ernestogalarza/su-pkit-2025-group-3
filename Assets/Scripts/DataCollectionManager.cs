@@ -1,14 +1,12 @@
 ﻿using System;
+using TMPro;
 using UnityEngine;
 
 public class DataCollectionManager : MonoBehaviour
 {
     private SteeringWheelManager steeringWheelManager;
     private AlertManager alertManager;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
 
-    private DateTime startAlert;
-    private DateTime endAlert;
     private DateTime reactionStart;
 
     private int idTemporal = 0;
@@ -28,17 +26,19 @@ public class DataCollectionManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        throttleTemporal = steeringWheelManager.getThrottle();
+        if (!alertManager.getIsAlertVisible()) {
+            throttleTemporal = steeringWheelManager.getThrottle();
+        }
+
+
+       
         if (alertManager.getIsAlertVisible() && !isLogStart)
         {
             idTemporal = alertManager.getIdAlert();
 
-            Debug.Log($" ID: {alertManager.getIdAlert()} - ✅ start {alertManager.getTimeStartAlert().ToString("HH:mm:ss")}");
+            Debug.Log($" ID: {alertManager.getIdAlert()} - ✅ start {alertManager.getTimeStartAlert().ToString("HH:mm:ss.fff")}");
             isLogStart = true;
 
-            if (throttleTemporal != steeringWheelManager.getThrottle()) {
-                Debug.Log($" ID: {alertManager.getIdAlert()} - ✅ ⚠️Reaction start {DateTime.Now.ToString("HH:mm:ss")}");
-            }
 
 
         }
@@ -46,10 +46,11 @@ public class DataCollectionManager : MonoBehaviour
         {
 
             TimeSpan diff = alertManager.getTimeEndAlert() - alertManager.getTimeStartAlert();
+            TimeSpan diffReaction = alertManager.getTimeEndAlert() - reactionStart;
 
 
-            Debug.Log($" ID: {alertManager.getIdAlert()} - 🛑 end {alertManager.getTimeEndAlert().ToString("HH:mm:ss")}");
-            Debug.Log($" ID: {alertManager.getIdAlert()} - 🚨 total alert time {diff.ToString(@"hh\:mm\:ss")}");
+            Debug.Log($" ID: {alertManager.getIdAlert()} - 🚨 total alert time {diff.ToString(@"hh\:mm\:ss\.fff")} -  end {alertManager.getTimeEndAlert().ToString("HH:mm:ss.fff")}");
+            Debug.Log($" ID: {alertManager.getIdAlert()} - 🛑 total reaction time {diffReaction.ToString(@"hh\:mm\:ss\.fff")}");
             alertManager.setIdAlert(alertManager.getIdAlert() + 1);
 
             isLogStart = false;
@@ -58,8 +59,11 @@ public class DataCollectionManager : MonoBehaviour
         }
 
 
-        if (alertManager.getIsAlertVisible() && throttleTemporal != steeringWheelManager.getThrottle() && !isReactionStart) {
-            Debug.Log($" ID: {alertManager.getIdAlert()} - ✅ ⚠️Reaction start {DateTime.Now.ToString("HH:mm:ss")}");
+        if (alertManager.getIsAlertVisible() && throttleTemporal < steeringWheelManager.getThrottle() && !isReactionStart) {
+
+            reactionStart = DateTime.Now;
+
+            Debug.Log($" ID: {alertManager.getIdAlert()} - ⚠️Reaction start {DateTime.Now.ToString("HH:mm:ss.fff")}");
             isReactionStart = true;
         }
     }

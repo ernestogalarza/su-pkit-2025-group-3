@@ -7019,6 +7019,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db2e18edd9ca7f1498c34d453140850f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
+  alertManager: {fileID: 0}
   newSpeed: 80
   speedText: {fileID: 0}
   speedLimitSignImage: {fileID: 0}
@@ -18760,6 +18761,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 642f818382c26df43ae14c80cddca99b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DataCollectionManager
+  speedText: {fileID: 457876432}
 --- !u!4 &407009913
 Transform:
   m_ObjectHideFlags: 0
@@ -28412,6 +28414,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db2e18edd9ca7f1498c34d453140850f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
+  alertManager: {fileID: 0}
   newSpeed: 80
   speedText: {fileID: 0}
   speedLimitSignImage: {fileID: 0}
@@ -34689,6 +34692,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db2e18edd9ca7f1498c34d453140850f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
+  alertManager: {fileID: 0}
   newSpeed: 50
   speedText: {fileID: 0}
   speedLimitSignImage: {fileID: 0}
@@ -41613,6 +41617,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db2e18edd9ca7f1498c34d453140850f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
+  alertManager: {fileID: 0}
   newSpeed: 30
   speedText: {fileID: 0}
   speedLimitSignImage: {fileID: 0}
@@ -49570,6 +49575,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db2e18edd9ca7f1498c34d453140850f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
+  alertManager: {fileID: 0}
   newSpeed: 30
   speedText: {fileID: 0}
   speedLimitSignImage: {fileID: 0}
@@ -52982,6 +52988,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db2e18edd9ca7f1498c34d453140850f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
+  alertManager: {fileID: 0}
   newSpeed: 80
   speedText: {fileID: 0}
   speedLimitSignImage: {fileID: 0}
@@ -78422,6 +78429,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db2e18edd9ca7f1498c34d453140850f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
+  alertManager: {fileID: 0}
   newSpeed: 40
   speedText: {fileID: 0}
   speedLimitSignImage: {fileID: 0}
@@ -85397,6 +85405,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db2e18edd9ca7f1498c34d453140850f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
+  alertManager: {fileID: 0}
   newSpeed: 40
   speedText: {fileID: 0}
   speedLimitSignImage: {fileID: 0}
@@ -90703,6 +90712,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db2e18edd9ca7f1498c34d453140850f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectCollision
+  alertManager: {fileID: 0}
   newSpeed: 80
   speedText: {fileID: 0}
   speedLimitSignImage: {fileID: 0}

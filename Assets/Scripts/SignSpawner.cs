@@ -328,7 +328,6 @@ public class AlertWallDetector : MonoBehaviour
     {
         Debug.Log($"🚨 Alert wall triggered by: {other.name}");
 
-        // Check if it's the car
         CarController car = other.GetComponent<CarController>();
         if (car == null)
             car = other.GetComponentInParent<CarController>();
@@ -337,10 +336,18 @@ public class AlertWallDetector : MonoBehaviour
         {
             Debug.Log($"✅ Car detected! Setting speed threshold to {speedLimit} km/h with {alertDelay}s delay");
 
+            // 🔴 NEW: Re-enable the alert system
+            if (alertManager != null && !alertManager.IsAlertSystemActive())
+            {
+                alertManager.EnableSpeedAlert();
+                Debug.Log("✅ Alert system re-enabled!");
+            }
+
             // Update the alert manager's speed threshold
             StartCoroutine(UpdateAlertAfterDelay());
         }
     }
+
 
     private IEnumerator UpdateAlertAfterDelay()
     {

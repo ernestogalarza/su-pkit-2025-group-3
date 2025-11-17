@@ -4,6 +4,13 @@ using System.Collections.Generic;
 public class SignSpawner : MonoBehaviour
 {
     [System.Serializable]
+    public class SpeedLimitSign
+    {
+        public int speedLimit; // e.g., 50, 60, 70, 80, 90, 100, 110, 120, 130
+        public GameObject signPrefab; // The 3D model/prefab for this speed limit
+    }
+
+    [System.Serializable]
     public class SpawnLocation
     {
         public Transform triggerWall; // The invisible wall trigger
@@ -13,9 +20,8 @@ public class SignSpawner : MonoBehaviour
         public string locationName; // For debugging (e.g., "Wall 1", "Wall 2")
     }
 
-    [Header("Sign Prefabs")]
-    public GameObject maxSpeedSign; // Sign for speed > 100 km/h
-    public GameObject minSpeedSign; // Sign for speed <= 100 km/h
+    [Header("Speed Limit Signs")]
+    public List<SpeedLimitSign> speedLimitSigns = new List<SpeedLimitSign>();
 
     [Header("Spawn Locations")]
     public List<SpawnLocation> spawnLocations = new List<SpawnLocation>();
@@ -37,15 +43,22 @@ public class SignSpawner : MonoBehaviour
 
         Debug.Log("✅ CarController found");
 
-        if (maxSpeedSign == null)
-            Debug.LogError("❌ maxSpeedSign prefab not assigned!");
-        else
-            Debug.Log("✅ maxSpeedSign prefab assigned");
+        if (speedLimitSigns.Count == 0)
+        {
+            Debug.LogError("❌ No speed limit signs configured!");
+            return;
+        }
 
-        if (minSpeedSign == null)
-            Debug.LogError("❌ minSpeedSign prefab not assigned!");
-        else
-            Debug.Log("✅ minSpeedSign prefab assigned");
+        Debug.Log($"✅ {speedLimitSigns.Count} speed limit signs configured");
+
+        // Validate all signs have prefabs
+        foreach (SpeedLimitSign sign in speedLimitSigns)
+        {
+            if (sign.signPrefab == null)
+                Debug.LogError($"❌ Speed limit sign {sign.speedLimit} km/h has no prefab assigned!");
+            else
+                Debug.Log($"✅ Speed limit sign {sign.speedLimit} km/h assigned");
+        }
 
         if (spawnLocations.Count == 0)
         {
@@ -105,6 +118,25 @@ public class SignSpawner : MonoBehaviour
         float currentSpeed = carController.getCurrentSpeed();
         Debug.Log($"📊 Current speed: {currentSpeed:F1} km/h");
 
+        // Calculate target speed: 30 km/h lower than current speed
+        int targetSpeedLimit = Mathf.RoundToInt(currentSpeed) - 30;
+        Debug.Log($"🎯 Target speed limit: {targetSpeedLimit} km/h (current - 30)");
+
+        // Find the closest sign that matches or is below the target speed
+        SpeedLimitSign selectedSign = FindBestSpeedLimitSign(targetSpeedLimit);
+
+        if (selectedSign == null)
+        {
+            Debug.LogWarning("⚠️  No suitable speed limit sign found!");
+            return;
+        }
+
+        if (selectedSign.signPrefab == null)
+        {
+            Debug.LogError($"❌ Speed limit sign {selectedSign.speedLimit} has no prefab assigned!");
+            return;
+        }
+
         // Destroy previous sign at this location if exists
         if (activeSignsByLocation.ContainsKey(location.triggerWall))
         {
@@ -113,27 +145,53 @@ public class SignSpawner : MonoBehaviour
             Debug.Log($"🗑️  Old sign destroyed");
         }
 
-        // Determine which sign to spawn
-        GameObject signPrefab = currentSpeed > 100f ? maxSpeedSign : minSpeedSign;
-        string signType = currentSpeed > 100f ? "MAX 120" : "MIN 120";
-
-        if (signPrefab == null)
-        {
-            Debug.LogError($"❌ Sign prefab is NULL! Cannot spawn.");
-            return;
-        }
-
-        Debug.Log($"🎯 Spawning {signType} sign at {location.spawnPosition} with rotation {location.spawnRotation} and scale {location.spawnScale}");
+        Debug.Log($"🎯 Spawning {selectedSign.speedLimit} km/h sign at {location.spawnPosition} with rotation {location.spawnRotation} and scale {location.spawnScale}");
 
         // Spawn the sign at the configured position
-        GameObject newSign = Instantiate(signPrefab, location.spawnPosition, Quaternion.Euler(location.spawnRotation));
+        GameObject newSign = Instantiate(selectedSign.signPrefab, location.spawnPosition, Quaternion.Euler(location.spawnRotation));
 
         // Apply scale
         newSign.transform.localScale = location.spawnScale;
 
         activeSignsByLocation[location.triggerWall] = newSign;
 
-        Debug.Log($"✅ {signType} sign spawned successfully at {location.spawnPosition}!");
+        Debug.Log($"✅ {selectedSign.speedLimit} km/h sign spawned successfully at {location.spawnPosition}!");
+    }
+
+    /// <summary>
+    /// Finds the best speed limit sign based on the target speed.
+    /// Returns the highest speed limit that is <= target speed.
+    /// If no speed is <= target, returns the lowest available speed limit.
+    /// </summary>
+    private SpeedLimitSign FindBestSpeedLimitSign(int targetSpeed)
+    {
+        SpeedLimitSign bestSign = null;
+
+        // Find the highest speed limit that is <= target speed
+        foreach (SpeedLimitSign sign in speedLimitSigns)
+        {
+            if (sign.speedLimit <= targetSpeed)
+            {
+                if (bestSign == null || sign.speedLimit > bestSign.speedLimit)
+                {
+                    bestSign = sign;
+                }
+            }
+        }
+
+        // If no sign found (target is too low), return the lowest speed limit sign
+        if (bestSign == null)
+        {
+            foreach (SpeedLimitSign sign in speedLimitSigns)
+            {
+                if (bestSign == null || sign.speedLimit < bestSign.speedLimit)
+                {
+                    bestSign = sign;
+                }
+            }
+        }
+
+        return bestSign;
     }
 }
 

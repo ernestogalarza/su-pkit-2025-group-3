@@ -148,8 +148,8 @@ public class SignSpawner : MonoBehaviour
         Debug.Log($"📊 Current speed: {currentSpeed:F1} km/h");
 
         // Calculate target speed: 30 km/h lower than current speed
-        int targetSpeedLimit = Mathf.RoundToInt(currentSpeed) - 30;
-        Debug.Log($"🎯 Target speed limit: {targetSpeedLimit} km/h (current - 30)");
+        int targetSpeedLimit = Mathf.RoundToInt(currentSpeed) - 20;
+        Debug.Log($"🎯 Target speed limit: {targetSpeedLimit} km/h (current - 20)");
 
         // Find the closest sign that matches or is below the target speed
         SpeedLimitSign selectedSign = FindBestSpeedLimitSign(targetSpeedLimit);

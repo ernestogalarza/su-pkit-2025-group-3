@@ -7,7 +7,7 @@ using UnityEngine.InputSystem.Controls;
 public class SteeringWheelManager : MonoBehaviour
 {
 
-    public TextMeshProUGUI speedText;               // Referencia al texto en la UI (opcional)
+    public TextMeshProUGUI speedText;  
 
 
     private VehicleControls controls;

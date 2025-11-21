@@ -100,7 +100,6 @@ public class CarController : MonoBehaviour
         float actualSpeed = rb.linearVelocity.magnitude * 3.6f;
 
         // Update speedometer
-        // Actualizar velocímetro
         if (speedometerNeedle != null)
         {
 
@@ -115,7 +114,7 @@ public class CarController : MonoBehaviour
             speedometerNeedle.localEulerAngles = new Vector3(0, 0, needleZ);
         }
 
-      //  speedText.text = $"{actualSpeed:F1} km/h";
+        speedText.text = $"{actualSpeed:F1}";
 
     }
 

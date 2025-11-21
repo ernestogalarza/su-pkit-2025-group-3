@@ -1,15 +1,16 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using Random = System.Random;
 
 public class AlertManager : MonoBehaviour
 {
     private CarController carController;
 
     [Header("References")]
-    public GameObject visualPanel; // Panel a mostrar u ocultar
-    public AudioSource alertAudio; // Audio de alerta
-    public SteeringWheelVibration steeringWheelVibration; // Referencia al componente de vibración
+    public GameObject visualPanel; // visual alert
+    public AudioSource alertAudio; // Audio alert
+    public SteeringWheelVibration steeringWheelVibration; // vibration component
 
     [Header("Settings")]
     public float speedThreshold = 60f; // Límite de velocidad para mostrar alerta
@@ -20,6 +21,8 @@ public class AlertManager : MonoBehaviour
     private int idAlert = 1;
     private DateTime startAlert;
     private DateTime endAlert;
+
+    private int typeAlert = 0;
 
     // NEW: Flag to enable/disable the alert system
     private bool isAlertActive = true;
@@ -49,7 +52,7 @@ public class AlertManager : MonoBehaviour
             alertCoroutine = null;
         }
 
-        Debug.Log("🚫 Speed alerts DISABLED - No speed limit enforcement");
+        //Debug.Log("🚫 Speed alerts DISABLED - No speed limit enforcement");
     }
 
     /// <summary>
@@ -58,7 +61,7 @@ public class AlertManager : MonoBehaviour
     public void EnableSpeedAlert()
     {
         isAlertActive = true;
-        Debug.Log("✅ Speed alerts ENABLED - Speed limit enforcement active");
+       // Debug.Log("✅ Speed alerts ENABLED - Speed limit enforcement active");
     }
 
     void Start()
@@ -121,24 +124,42 @@ public class AlertManager : MonoBehaviour
 
     private void ShowAlert()
     {
+
+        Random random = new Random();
+
+        typeAlert = random.Next(0, 2); // audio = 0 and vibration = 1
+       // Debug.Log($" typeAlert: {typeAlert} - ⚠️Reaction start {DateTime.Now.ToString("HH:mm:ss.fff")}");
+
         if (visualPanel != null)
             visualPanel.SetActive(true);
 
-        if (alertAudio != null && !alertAudio.isPlaying)
+        if (alertAudio != null && !alertAudio.isPlaying && typeAlert == 0) {
             alertAudio.Play();
+          //  Debug.Log("🚨 Alert Sound Enable");
+        }
+          
 
-        // Activar vibración del volante
-        if (steeringWheelVibration != null)
+        // enable steeringWheelVibration vibration
+        if (steeringWheelVibration != null && typeAlert ==1)
         {
             steeringWheelVibration.StartVibration(steeringWheelVibration.vibrationIntensity);
-            // Debug.Log("🚨 Alerta activada: velocidad superior a límite + vibración iniciada");
-        }
-        else
-        {
-            // Debug.LogWarning("⚠️ SteeringWheelVibration component not assigned!");
+            //Debug.Log("🚨 Alert Vibration Enable");
         }
 
         isAlertVisible = true;
+    }
+
+    public string getTypeAlert() {
+
+        switch (typeAlert)
+        {
+            case 0:
+                return "🔊audio";
+
+            case 1:
+                return "🔔vibration";
+        }
+        return "NO_ALERT";
     }
 
     private void HideAlert()

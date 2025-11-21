@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class SignSpawner : MonoBehaviour
 {
@@ -43,15 +44,17 @@ public class SignSpawner : MonoBehaviour
 
     private CarController carController;
     private AlertManager alertManager;
+    private DataCollectionManager dataCollectionManager;
     private Dictionary<Transform, GameObject> activeSignsByLocation = new Dictionary<Transform, GameObject>();
     private Dictionary<Transform, GameObject> activeAlertWallsByLocation = new Dictionary<Transform, GameObject>();
 
     void Start()
     {
-        Debug.Log("=== SignSpawner Started ===");
+        //Debug.Log("=== SignSpawner Started ===");
 
         carController = GameObject.Find("CarDriverController").GetComponent<CarController>();
         alertManager = GameObject.Find("AlertManager").GetComponent<AlertManager>();
+        dataCollectionManager = GameObject.Find("DataCollectionManager").GetComponent<DataCollectionManager>();
 
         if (carController == null)
         {
@@ -65,7 +68,7 @@ public class SignSpawner : MonoBehaviour
             return;
         }
 
-        Debug.Log("✅ CarController and AlertManager found");
+       // Debug.Log("✅ CarController and AlertManager found");
 
         if (speedLimitSigns.Count == 0)
         {
@@ -73,15 +76,15 @@ public class SignSpawner : MonoBehaviour
             return;
         }
 
-        Debug.Log($"✅ {speedLimitSigns.Count} speed limit signs configured");
+      //  Debug.Log($"✅ {speedLimitSigns.Count} speed limit signs configured");
 
         // Validate all signs have prefabs
         foreach (SpeedLimitSign sign in speedLimitSigns)
         {
             if (sign.signPrefab == null)
                 Debug.LogError($"❌ Speed limit sign {sign.speedLimit} km/h has no prefab assigned!");
-            else
-                Debug.Log($"✅ Speed limit sign {sign.speedLimit} km/h assigned");
+          //  else
+              //  Debug.Log($"✅ Speed limit sign {sign.speedLimit} km/h assigned");
         }
 
         if (alertWallPrefab == null)
@@ -95,7 +98,7 @@ public class SignSpawner : MonoBehaviour
             return;
         }
 
-        Debug.Log($"✅ {spawnLocations.Count} spawn locations configured");
+       // Debug.Log($"✅ {spawnLocations.Count} spawn locations configured");
 
         // Attach trigger scripts to each wall
         foreach (SpawnLocation location in spawnLocations)
@@ -106,7 +109,7 @@ public class SignSpawner : MonoBehaviour
                 continue;
             }
 
-            Debug.Log($"📍 Setting up trigger: {location.locationName}");
+            //Debug.Log($"📍 Setting up trigger: {location.locationName}");
 
             // Check if trigger has collider
             Collider triggerCollider = location.triggerWall.GetComponent<Collider>();
@@ -122,13 +125,13 @@ public class SignSpawner : MonoBehaviour
                 continue;
             }
 
-            Debug.Log($"✅ {location.locationName} has valid trigger collider");
+            //Debug.Log($"✅ {location.locationName} has valid trigger collider");
 
             TriggerWallDetector detector = location.triggerWall.GetComponent<TriggerWallDetector>();
             if (detector == null)
             {
                 detector = location.triggerWall.gameObject.AddComponent<TriggerWallDetector>();
-                Debug.Log($"✅ Added TriggerWallDetector to {location.locationName}");
+               // Debug.Log($"✅ Added TriggerWallDetector to {location.locationName}");
             }
             detector.SetSpawner(this, location);
         }
@@ -136,7 +139,7 @@ public class SignSpawner : MonoBehaviour
 
     public void OnWallTriggerEnter(SpawnLocation location)
     {
-        Debug.Log($"🚗 Car passed {location.locationName}!");
+        //Debug.Log($"🚗 Car passed {location.locationName}!");
 
         if (carController == null)
         {
@@ -145,11 +148,13 @@ public class SignSpawner : MonoBehaviour
         }
 
         float currentSpeed = carController.getCurrentSpeed();
-        Debug.Log($"📊 Current speed: {currentSpeed:F1} km/h");
+
+        Debug.Log($"🎯spawn sign start: {DateTime.Now.ToString("HH:mm:ss.fff")} - 📊 Current speed: {currentSpeed:F1} km/h");
+        dataCollectionManager.setSpawnSignAlert(true);
 
         // Calculate target speed: 30 km/h lower than current speed
         int targetSpeedLimit = Mathf.RoundToInt(currentSpeed) - 20;
-        Debug.Log($"🎯 Target speed limit: {targetSpeedLimit} km/h (current - 20)");
+     //   Debug.Log($"🎯 Target speed limit: {targetSpeedLimit} km/h (current - 20)");
 
         // Find the closest sign that matches or is below the target speed
         SpeedLimitSign selectedSign = FindBestSpeedLimitSign(targetSpeedLimit);
@@ -182,14 +187,14 @@ public class SignSpawner : MonoBehaviour
             Debug.Log($"🗑️ Old alert wall destroyed");
         }
 
-        Debug.Log($"🎯 Spawning {selectedSign.speedLimit} km/h sign at {location.signSpawnPosition}");
+       // Debug.Log($"🎯 Spawning {selectedSign.speedLimit} km/h sign at {location.signSpawnPosition}");
 
         // Spawn the sign at the configured position
         GameObject newSign = Instantiate(selectedSign.signPrefab, location.signSpawnPosition, Quaternion.Euler(location.signSpawnRotation));
         newSign.transform.localScale = location.signSpawnScale;
         activeSignsByLocation[location.triggerWall] = newSign;
 
-        Debug.Log($"✅ {selectedSign.speedLimit} km/h sign spawned successfully!");
+      //  Debug.Log($"✅ {selectedSign.speedLimit} km/h sign spawned successfully!");
 
         // Spawn the alert trigger wall
         SpawnAlertWall(location, selectedSign.speedLimit);
@@ -234,7 +239,7 @@ public class SignSpawner : MonoBehaviour
 
         activeAlertWallsByLocation[location.triggerWall] = alertWall;
 
-        Debug.Log($"✅ Alert wall spawned at {location.alertWallSpawnPosition} with speed limit {speedLimit} km/h");
+       // Debug.Log($"✅ Alert wall spawned at {location.alertWallSpawnPosition} with speed limit {speedLimit} km/h");
     }
 
     /// <summary>
@@ -288,7 +293,7 @@ public class TriggerWallDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"🔔 Trigger collision detected on {location.locationName} with: {other.name} (Tag: {other.tag})");
+        //Debug.Log($"🔔 Trigger collision detected on {location.locationName} with: {other.name} (Tag: {other.tag})");
 
         // Try to find CarController in the collider or its parents
         CarController carController = other.GetComponent<CarController>();
@@ -298,7 +303,7 @@ public class TriggerWallDetector : MonoBehaviour
         // Also check by collider name (your car uses "ColliderBody")
         if (carController != null || other.name == "ColliderBody")
         {
-            Debug.Log("✅ Vehicle detected!");
+           // Debug.Log("✅ Vehicle detected!");
             spawner.OnWallTriggerEnter(location);
         }
         else
@@ -326,7 +331,7 @@ public class AlertWallDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"🚨 Alert wall triggered by: {other.name}");
+        //Debug.Log($"🚨 Alert wall triggered by: {other.name}");
 
         CarController car = other.GetComponent<CarController>();
         if (car == null)
@@ -334,13 +339,13 @@ public class AlertWallDetector : MonoBehaviour
 
         if (car != null || other.name == "ColliderBody")
         {
-            Debug.Log($"✅ Car detected! Setting speed threshold to {speedLimit} km/h with {alertDelay}s delay");
+           // Debug.Log($"✅ Car detected! Setting speed threshold to {speedLimit} km/h with {alertDelay}s delay");
 
             // 🔴 NEW: Re-enable the alert system
             if (alertManager != null && !alertManager.IsAlertSystemActive())
             {
                 alertManager.EnableSpeedAlert();
-                Debug.Log("✅ Alert system re-enabled!");
+               // Debug.Log("✅ Alert system re-enabled!");
             }
 
             // Update the alert manager's speed threshold
@@ -356,7 +361,7 @@ public class AlertWallDetector : MonoBehaviour
         if (alertManager != null)
         {
             alertManager.setSpeedAlert(speedLimit);
-            Debug.Log($"⚠️ Alert threshold updated to {speedLimit} km/h after {alertDelay}s delay");
+            //Debug.Log($"⚠️ Alert threshold updated to {speedLimit} km/h after {alertDelay}s delay");
         }
     }
 }

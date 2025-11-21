@@ -28,12 +28,12 @@ public class NoRulesWall : MonoBehaviour
         }
         collider.isTrigger = true;
 
-        Debug.Log($"✅ NoRulesWall initialized at {transform.position}");
+       // Debug.Log($"✅ NoRulesWall initialized at {transform.position}");
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"🚫 No Rules wall collision detected with: {other.name}");
+       // Debug.Log($"🚫 No Rules wall collision detected with: {other.name}");
 
         // Check if it's the car
         CarController carController = other.GetComponent<CarController>();
@@ -42,7 +42,7 @@ public class NoRulesWall : MonoBehaviour
 
         if (carController != null || other.name == "ColliderBody")
         {
-            Debug.Log("✅ Car detected on No Rules wall!");
+         //   Debug.Log("✅ Car detected on No Rules wall!");
 
             // Disable the alert after delay
             StartCoroutine(DisableAlertAfterDelay());
@@ -56,7 +56,7 @@ public class NoRulesWall : MonoBehaviour
         if (alertManager != null)
         {
             alertManager.DisableSpeedAlert();
-            Debug.Log($"🚗 Speed alerts disabled! Car can drive any speed.");
+            Debug.Log($"🚗🚫 Speed alerts disabled by Sign.");
         }
     }
 }

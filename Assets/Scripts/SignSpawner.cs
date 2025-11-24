@@ -314,12 +314,16 @@ public class TriggerWallDetector : MonoBehaviour
 }
 
 // Component for dynamically spawned alert trigger walls
+// Component for dynamically spawned alert trigger walls
 public class AlertWallDetector : MonoBehaviour
 {
     private CarController carController;
     private AlertManager alertManager;
     private int speedLimit;
     private float alertDelay;
+
+    // 🔴 NEW: Static counter to cycle through alert types
+    private static int alertTypeCounter = 0;
 
     public void SetAlertSettings(CarController car, AlertManager alert, int limit, float delay)
     {
@@ -331,7 +335,7 @@ public class AlertWallDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        //Debug.Log($"🚨 Alert wall triggered by: {other.name}");
+        Debug.Log($"🚨 Alert wall triggered by: {other.name}");
 
         CarController car = other.GetComponent<CarController>();
         if (car == null)
@@ -339,20 +343,41 @@ public class AlertWallDetector : MonoBehaviour
 
         if (car != null || other.name == "ColliderBody")
         {
-           // Debug.Log($"✅ Car detected! Setting speed threshold to {speedLimit} km/h with {alertDelay}s delay");
+            Debug.Log($"✅ Car detected! Setting speed threshold to {speedLimit} km/h");
 
-            // 🔴 NEW: Re-enable the alert system
-            if (alertManager != null && !alertManager.IsAlertSystemActive())
+            // 🔴 NEW: If alert is currently visible, mark it as zone exit
+            if (alertManager != null && alertManager.getIsAlertVisible())
+            {
+                // Alert will end due to entering new zone, not compliance
+                alertManager.DisableSpeedAlert(); // This now marks as ZoneExit
+                alertManager.EnableSpeedAlert();  // Re-enable for new zone
+            }
+            else if (alertManager != null && !alertManager.IsAlertSystemActive())
             {
                 alertManager.EnableSpeedAlert();
-               // Debug.Log("✅ Alert system re-enabled!");
             }
 
-            // Update the alert manager's speed threshold
+            // Set the alert type
+            int currentAlertType = alertTypeCounter % 3;
+            alertManager.SetAlertType(currentAlertType);
+            alertTypeCounter++;
+
+            // Update threshold
             StartCoroutine(UpdateAlertAfterDelay());
         }
     }
 
+
+    private string GetAlertTypeName(int type)
+    {
+        switch (type)
+        {
+            case 0: return "🔊 SOUND";
+            case 1: return "🔔 VIBRATION";
+            case 2: return "👁️ VISUAL ONLY";
+            default: return "UNKNOWN";
+        }
+    }
 
     private IEnumerator UpdateAlertAfterDelay()
     {
@@ -361,7 +386,8 @@ public class AlertWallDetector : MonoBehaviour
         if (alertManager != null)
         {
             alertManager.setSpeedAlert(speedLimit);
-            //Debug.Log($"⚠️ Alert threshold updated to {speedLimit} km/h after {alertDelay}s delay");
+            Debug.Log($"⚠️ Alert threshold updated to {speedLimit} km/h after {alertDelay}s delay");
         }
     }
 }
+

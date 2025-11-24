@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using System;
-using Random = System.Random;
 
 public class AlertManager : MonoBehaviour
 {
@@ -13,8 +12,8 @@ public class AlertManager : MonoBehaviour
     public SteeringWheelVibration steeringWheelVibration; // vibration component
 
     [Header("Settings")]
-    public float speedThreshold = 60f; // Límite de velocidad para mostrar alerta
-    public float delayBeforeShow = 1f; // Retraso en segundos antes de mostrar
+    public float speedThreshold = 60f; // Speed limit threshold
+    public float delayBeforeShow = 1f; // Delay before showing alert
 
     private bool isAlertVisible = false;
     private Coroutine alertCoroutine;
@@ -22,7 +21,8 @@ public class AlertManager : MonoBehaviour
     private DateTime startAlert;
     private DateTime endAlert;
 
-    private int typeAlert = 0;
+    // 🔴 NEW: Alert type is now set externally (not random)
+    private int typeAlert = 0; // 0 = sound, 1 = vibration, 2 = visual only
 
     // NEW: Flag to enable/disable the alert system
     private bool isAlertActive = true;
@@ -33,15 +33,36 @@ public class AlertManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 🔴 NEW: Sets the alert modality type
+    /// </summary>
+    public void SetAlertType(int alertType)
+    {
+        typeAlert = alertType;
+        Debug.Log($"🎯 Alert type set to: {GetAlertTypeName(alertType)}");
+    }
+
+    private string GetAlertTypeName(int type)
+    {
+        switch (type)
+        {
+            case 0: return "🔊 SOUND";
+            case 1: return "🔔 VIBRATION";
+            case 2: return "👁️ VISUAL ONLY";
+            default: return "UNKNOWN";
+        }
+    }
+
+    /// <summary>
     /// Disables the speed alert system (for No Rules signs)
     /// </summary>
     public void DisableSpeedAlert()
     {
         isAlertActive = false;
 
-        // Hide current alert if visible
+        // 🔴 NEW: Mark that alert ended due to zone exit
         if (isAlertVisible)
         {
+            lastAlertEndReason = AlertEndReason.ZoneExit;
             HideAlert();
         }
 
@@ -51,9 +72,8 @@ public class AlertManager : MonoBehaviour
             StopCoroutine(alertCoroutine);
             alertCoroutine = null;
         }
-
-        //Debug.Log("🚫 Speed alerts DISABLED - No speed limit enforcement");
     }
+
 
     /// <summary>
     /// Re-enables the speed alert system
@@ -61,7 +81,7 @@ public class AlertManager : MonoBehaviour
     public void EnableSpeedAlert()
     {
         isAlertActive = true;
-       // Debug.Log("✅ Speed alerts ENABLED - Speed limit enforcement active");
+        // Debug.Log("✅ Speed alerts ENABLED - Speed limit enforcement active");
     }
 
     void Start()
@@ -87,13 +107,11 @@ public class AlertManager : MonoBehaviour
 
     public void UpdateAlert(float currentSpeed)
     {
-        // Only check speed if alerts are enabled
         if (!isAlertActive)
             return;
 
         if (currentSpeed > speedThreshold + 1f)
         {
-            // Si supera el límite y no se ha mostrado aún, iniciar temporizador
             if (!isAlertVisible && alertCoroutine == null)
             {
                 alertCoroutine = StartCoroutine(ShowAfterDelay());
@@ -108,9 +126,14 @@ public class AlertManager : MonoBehaviour
             }
 
             if (isAlertVisible)
+            {
+                // 🔴 NEW: Mark as compliance (speed naturally dropped)
+                lastAlertEndReason = AlertEndReason.Compliance;
                 HideAlert();
+            }
         }
     }
+
 
     private IEnumerator ShowAfterDelay()
     {
@@ -124,40 +147,48 @@ public class AlertManager : MonoBehaviour
 
     private void ShowAlert()
     {
+        // 🔴 REMOVED: Random alert type generation
+        // Now typeAlert is set externally via SetAlertType()
 
-        Random random = new Random();
+        Debug.Log($"⚠️ Alert triggered - Type: {GetAlertTypeName(typeAlert)} at {DateTime.Now:HH:mm:ss.fff}");
 
-        typeAlert = random.Next(0, 2); // audio = 0 and vibration = 1
-       // Debug.Log($" typeAlert: {typeAlert} - ⚠️Reaction start {DateTime.Now.ToString("HH:mm:ss.fff")}");
-
+        // Always show visual panel
         if (visualPanel != null)
             visualPanel.SetActive(true);
 
-        if (alertAudio != null && !alertAudio.isPlaying && typeAlert == 0) {
+        // Type 0: Sound + Visual
+        if (alertAudio != null && !alertAudio.isPlaying && typeAlert == 0)
+        {
             alertAudio.Play();
-          //  Debug.Log("🚨 Alert Sound Enable");
+            Debug.Log("🔊 Alert SOUND enabled");
         }
-          
 
-        // enable steeringWheelVibration vibration
-        if (steeringWheelVibration != null && typeAlert ==1)
+        // Type 1: Vibration + Visual
+        if (steeringWheelVibration != null && typeAlert == 1)
         {
             steeringWheelVibration.StartVibration(steeringWheelVibration.vibrationIntensity);
-            //Debug.Log("🚨 Alert Vibration Enable");
+            Debug.Log("🔔 Alert VIBRATION enabled");
+        }
+
+        // Type 2: Visual only (no sound, no vibration)
+        if (typeAlert == 2)
+        {
+            Debug.Log("👁️ Alert VISUAL ONLY enabled");
         }
 
         isAlertVisible = true;
     }
 
-    public string getTypeAlert() {
-
+    public string getTypeAlert()
+    {
         switch (typeAlert)
         {
             case 0:
                 return "🔊audio";
-
             case 1:
                 return "🔔vibration";
+            case 2:
+                return "👁️visual";
         }
         return "NO_ALERT";
     }
@@ -170,17 +201,51 @@ public class AlertManager : MonoBehaviour
         if (alertAudio != null && alertAudio.isPlaying)
             alertAudio.Stop();
 
-        // Detener vibración del volante
+        // Stop steering wheel vibration
         if (steeringWheelVibration != null)
         {
             steeringWheelVibration.StopVibration();
-            // Debug.Log("✅ Alerta desactivada: velocidad dentro del rango + vibración detenida");
         }
 
-        // idAlert++;
         endAlert = DateTime.Now;
         isAlertVisible = false;
+
+        // 🔴 NEW: Log the end reason
+        Debug.Log($"🔚 Alert ended - Reason: {GetAlertEndReasonText()}");
     }
+
+
+    public enum AlertEndReason
+    {
+        Compliance,      // Speed dropped below threshold
+        ZoneExit,        // Entered new zone (speed limit or no rules)
+        SystemDisabled   // Alert system disabled
+    }
+
+    private AlertEndReason lastAlertEndReason = AlertEndReason.Compliance;
+
+    // NEW: Get why the last alert ended
+    public AlertEndReason GetLastAlertEndReason()
+    {
+        return lastAlertEndReason;
+    }
+
+    // NEW: Get human-readable end reason
+    public string GetAlertEndReasonText()
+    {
+        switch (lastAlertEndReason)
+        {
+            case AlertEndReason.Compliance:
+                return "✅ COMPLIED";
+            case AlertEndReason.ZoneExit:
+                return "⚠️ EXITED ZONE";
+            case AlertEndReason.SystemDisabled:
+                return "🚫 SYSTEM DISABLED";
+            default:
+                return "UNKNOWN";
+        }
+    }
+
 
     public bool getIsAlertVisible()
     {

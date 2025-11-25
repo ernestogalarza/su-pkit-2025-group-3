@@ -11,11 +11,17 @@ public class DataCollectionManager : MonoBehaviour
     private bool isLogStart = false;
     private bool isReactionStart = false;
     private float throttleTemporal;
+    private int speedLimit;
+
+    private string textOnLog;
+
+    public TextMeshProUGUI speedText;
 
     void Start()
     {
         steeringWheelManager = GameObject.Find("SteeringWheelManager").GetComponent<SteeringWheelManager>();
         alertManager = GameObject.Find("AlertManager").GetComponent<AlertManager>();
+        textOnLog = null;
     }
 
     // Update is called once per frame
@@ -31,13 +37,15 @@ public class DataCollectionManager : MonoBehaviour
         if (alertManager.getIsAlertVisible() && !isLogStart)
         {
             idTemporal = alertManager.getIdAlert();
-            Debug.Log($" ID: {alertManager.getIdAlert()} - TYPE: {alertManager.getTypeAlert()} - ✅ start {alertManager.getTimeStartAlert().ToString("HH:mm:ss.fff")}");
+            Debug.Log($"ID: {alertManager.getIdAlert()} - ✅ startAlert {alertManager.getTimeStartAlert().ToString("HH:mm:ss.fff")} - TYPE: {alertManager.getTypeAlert()} - 🎯SPEED: {speedLimit}  ");
             isLogStart = true;
         }
 
+        speedText.text = $"tmp: {throttleTemporal} - now: {steeringWheelManager.getThrottle()}";
+
         // DETECT REACTION: Driver reduces throttle (FIXED CONDITION)
         if (alertManager.getIsAlertVisible() &&
-            throttleTemporal > steeringWheelManager.getThrottle() &&
+            throttleTemporal < steeringWheelManager.getThrottle() &&
             !isReactionStart)
         {
             reactionStart = DateTime.Now;
@@ -54,22 +62,42 @@ public class DataCollectionManager : MonoBehaviour
             TimeSpan diff = alertManager.getTimeEndAlert() - alertManager.getTimeStartAlert();
             TimeSpan diffReaction = alertManager.getTimeEndAlert() - reactionStart;
 
-            Debug.Log($" ID: {alertManager.getIdAlert()} - 🚨 end alert: {alertManager.getTimeEndAlert().ToString("HH:mm:ss.fff")} - duration: {diff.ToString(@"hh\:mm\:ss\.fff")} ");
+            //Debug.Log($" ID: {alertManager.getIdAlert()} - 🛑endAlert: {alertManager.getTimeEndAlert().ToString("HH:mm:ss.fff")} - duration: {diff.ToString(@"hh\:mm\:ss\.fff")} ");
 
             if (isReactionStart)
             {
-                Debug.Log($" ID: {alertManager.getIdAlert()} - 🛑 reaction duration: {diffReaction.ToString(@"hh\:mm\:ss\.fff")}");
+                Debug.Log($" ID: {alertManager.getIdAlert()} - 🛑endAlert: {alertManager.getTimeEndAlert().ToString("HH:mm:ss.fff")} - duration: {diff.ToString(@"hh\:mm\:ss\.fff")} - ⚠️ reaction duration: {diffReaction.ToString(@"hh\:mm\:ss\.fff")}");
+            }
+            else {
+
+                Debug.Log($" ID: {alertManager.getIdAlert()} - 🛑endAlert: {alertManager.getTimeEndAlert().ToString("HH:mm:ss.fff")} - duration: {diff.ToString(@"hh\:mm\:ss\.fff")} ");
             }
 
             alertManager.setIdAlert(alertManager.getIdAlert() + 1);
             isLogStart = false;
             isReactionStart = false;
         }
+
+
+
+        if (!String.IsNullOrEmpty(textOnLog)) {
+            Debug.Log(textOnLog);
+            textOnLog = null;
+        }
+
     }
 
     // 🔴 ADD THIS: Dummy method so SignSpawner doesn't break
     public void setSpawnSignAlert(bool value)
     {
         // Not used - kept for compatibility with SignSpawner
+    }
+
+    public void setSpeedLimit(int speed) {
+        speedLimit = speed;
+    }
+
+    public void setTextOnLog(string text) {
+        textOnLog = text;
     }
 }

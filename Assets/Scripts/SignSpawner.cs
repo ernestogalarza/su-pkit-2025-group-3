@@ -153,7 +153,7 @@ public class SignSpawner : MonoBehaviour
         dataCollectionManager.setSpawnSignAlert(true);
 
         // Calculate target speed: 30 km/h lower than current speed
-        int targetSpeedLimit = Mathf.RoundToInt(currentSpeed) - 20;
+        int targetSpeedLimit = Mathf.RoundToInt(currentSpeed) - 25;
      //   Debug.Log($"🎯 Target speed limit: {targetSpeedLimit} km/h (current - 20)");
 
         // Find the closest sign that matches or is below the target speed
@@ -235,7 +235,7 @@ public class SignSpawner : MonoBehaviour
 
         // Add the alert trigger detector component
         AlertWallDetector alertDetector = alertWall.AddComponent<AlertWallDetector>();
-        alertDetector.SetAlertSettings(carController, alertManager, speedLimit, alertDelay);
+        alertDetector.SetAlertSettings(carController, alertManager, dataCollectionManager, speedLimit, alertDelay);
 
         activeAlertWallsByLocation[location.triggerWall] = alertWall;
 
@@ -319,23 +319,25 @@ public class AlertWallDetector : MonoBehaviour
 {
     private CarController carController;
     private AlertManager alertManager;
+    private DataCollectionManager dataCollectionManager;
     private int speedLimit;
     private float alertDelay;
 
     // 🔴 NEW: Static counter to cycle through alert types
     private static int alertTypeCounter = 0;
 
-    public void SetAlertSettings(CarController car, AlertManager alert, int limit, float delay)
+    public void SetAlertSettings(CarController car, AlertManager alert, DataCollectionManager data, int limit, float delay)
     {
         carController = car;
         alertManager = alert;
         speedLimit = limit;
         alertDelay = delay;
+        dataCollectionManager= data;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"🚨 Alert wall triggered by: {other.name}");
+        //Debug.Log($"🚨 Alert wall triggered by: {other.name}");
 
         CarController car = other.GetComponent<CarController>();
         if (car == null)
@@ -343,7 +345,8 @@ public class AlertWallDetector : MonoBehaviour
 
         if (car != null || other.name == "ColliderBody")
         {
-            Debug.Log($"✅ Car detected! Setting speed threshold to {speedLimit} km/h");
+           Debug.Log($"✅ Start Speed Limit Section: 🎯{speedLimit} km/h");
+            dataCollectionManager.setSpeedLimit(speedLimit);
 
             // 🔴 NEW: If alert is currently visible, mark it as zone exit
             if (alertManager != null && alertManager.getIsAlertVisible())
@@ -386,7 +389,7 @@ public class AlertWallDetector : MonoBehaviour
         if (alertManager != null)
         {
             alertManager.setSpeedAlert(speedLimit);
-            Debug.Log($"⚠️ Alert threshold updated to {speedLimit} km/h after {alertDelay}s delay");
+           // Debug.Log($"⚠️ Alert threshold updated to {speedLimit} km/h after {alertDelay}s delay");
         }
     }
 }

@@ -21,6 +21,8 @@ public class AlertManager : MonoBehaviour
     private DateTime startAlert;
     private DateTime endAlert;
 
+
+    private DataCollectionManager dataCollectionManager;
     // 🔴 NEW: Alert type is now set externally (not random)
     private int typeAlert = 0; // 0 = sound, 1 = vibration, 2 = visual only
 
@@ -38,7 +40,7 @@ public class AlertManager : MonoBehaviour
     public void SetAlertType(int alertType)
     {
         typeAlert = alertType;
-        Debug.Log($"🎯 Alert type set to: {GetAlertTypeName(alertType)}");
+        //Debug.Log($"🎯 Alert type set to: {GetAlertTypeName(alertType)}");
     }
 
     private string GetAlertTypeName(int type)
@@ -87,6 +89,7 @@ public class AlertManager : MonoBehaviour
     void Start()
     {
         carController = GameObject.Find("CarDriverController").GetComponent<CarController>();
+        dataCollectionManager = GameObject.Find("DataCollectionManager").GetComponent<DataCollectionManager>();
 
         // Verify references
         if (steeringWheelVibration == null)
@@ -150,7 +153,7 @@ public class AlertManager : MonoBehaviour
         // 🔴 REMOVED: Random alert type generation
         // Now typeAlert is set externally via SetAlertType()
 
-        Debug.Log($"⚠️ Alert triggered - Type: {GetAlertTypeName(typeAlert)} at {DateTime.Now:HH:mm:ss.fff}");
+       // Debug.Log($"⚠️ Alert triggered - Type: {GetAlertTypeName(typeAlert)} at {DateTime.Now:HH:mm:ss.fff}");
 
         // Always show visual panel
         if (visualPanel != null)
@@ -160,20 +163,20 @@ public class AlertManager : MonoBehaviour
         if (alertAudio != null && !alertAudio.isPlaying && typeAlert == 0)
         {
             alertAudio.Play();
-            Debug.Log("🔊 Alert SOUND enabled");
+          //  Debug.Log("🔊 Alert SOUND enabled");
         }
 
         // Type 1: Vibration + Visual
         if (steeringWheelVibration != null && typeAlert == 1)
         {
             steeringWheelVibration.StartVibration(steeringWheelVibration.vibrationIntensity);
-            Debug.Log("🔔 Alert VIBRATION enabled");
+         //   Debug.Log("🔔 Alert VIBRATION enabled");
         }
 
         // Type 2: Visual only (no sound, no vibration)
         if (typeAlert == 2)
         {
-            Debug.Log("👁️ Alert VISUAL ONLY enabled");
+         //   Debug.Log("👁️ Alert VISUAL ONLY enabled");
         }
 
         isAlertVisible = true;
@@ -184,11 +187,11 @@ public class AlertManager : MonoBehaviour
         switch (typeAlert)
         {
             case 0:
-                return "🔊audio";
+                return "🔊AUDIO";
             case 1:
-                return "🔔vibration";
+                return "🔔VIBRATION";
             case 2:
-                return "👁️visual";
+                return "👁️VISUAL";
         }
         return "NO_ALERT";
     }
@@ -211,6 +214,7 @@ public class AlertManager : MonoBehaviour
         isAlertVisible = false;
 
         // 🔴 NEW: Log the end reason
+       // dataCollectionManager.setTextOnLog($"🔚 Alert ended - Reason: {GetAlertEndReasonText()}");
         Debug.Log($"🔚 Alert ended - Reason: {GetAlertEndReasonText()}");
     }
 

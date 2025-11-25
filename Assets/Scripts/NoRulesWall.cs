@@ -10,9 +10,11 @@ public class NoRulesWall : MonoBehaviour
     public float alertDelay = 0.2f; // Delay before removing alert
     public string noRulesSignName = "NoRulesSign"; // For debugging
 
+    private DataCollectionManager dataCollectionManager;
     void Start()
     {
         alertManager = GameObject.Find("AlertManager").GetComponent<AlertManager>();
+        dataCollectionManager = GameObject.Find("DataCollectionManager").GetComponent<DataCollectionManager>();
 
         if (alertManager == null)
         {
@@ -56,7 +58,7 @@ public class NoRulesWall : MonoBehaviour
         if (alertManager != null)
         {
             alertManager.DisableSpeedAlert();
-            Debug.Log($"🚗🚫 Speed alerts disabled by Sign.");
+            dataCollectionManager.setTextOnLog($"🚗🚫 Speed alerts disabled by Sign.");
         }
     }
 }

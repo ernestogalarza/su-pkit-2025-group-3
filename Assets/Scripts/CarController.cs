@@ -114,7 +114,7 @@ public class CarController : MonoBehaviour
             speedometerNeedle.localEulerAngles = new Vector3(0, 0, needleZ);
         }
 
-        speedText.text = $"{actualSpeed:F1}";
+       // speedText.text = $"{actualSpeed:F1}";
 
     }
 

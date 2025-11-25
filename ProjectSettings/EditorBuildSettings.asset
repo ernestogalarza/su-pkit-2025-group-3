@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/CarScene.unity
     guid: 1f6e32d9ac23b4f69af7f506acde5a73
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/PilotSceneVibration.unity
     guid: f93c5748e55971f4882708f40779dc8f
   m_configObjects:

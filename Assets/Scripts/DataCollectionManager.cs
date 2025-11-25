@@ -15,7 +15,7 @@ public class DataCollectionManager : MonoBehaviour
 
     private string textOnLog;
 
-    public TextMeshProUGUI speedText;
+    //public TextMeshProUGUI speedText;
 
     void Start()
     {
@@ -41,7 +41,7 @@ public class DataCollectionManager : MonoBehaviour
             isLogStart = true;
         }
 
-        speedText.text = $"tmp: {throttleTemporal} - now: {steeringWheelManager.getThrottle()}";
+        //speedText.text = $"tmp: {throttleTemporal} - now: {steeringWheelManager.getThrottle()}";
 
         // DETECT REACTION: Driver reduces throttle (FIXED CONDITION)
         if (alertManager.getIsAlertVisible() &&

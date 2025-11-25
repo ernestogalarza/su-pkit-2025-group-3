@@ -5,15 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 0
-    path: Assets/Scenes/CarScene.unity
-    guid: 1f6e32d9ac23b4f69af7f506acde5a73
-  - enabled: 0
-    path: Assets/Scenes/PilotSceneVibration.unity
-    guid: f93c5748e55971f4882708f40779dc8f
+  - enabled: 1
+    path: Assets/Scenes/HighwaySceen.unity
+    guid: 6823f8c93599e604fb6c023e45434aa3
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: b89b595a88e7afa4b9cb11d6369ddd6c, type: 3}
   m_UseUCBPForAssetBundles: 0

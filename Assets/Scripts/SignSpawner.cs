@@ -324,7 +324,7 @@ public class AlertWallDetector : MonoBehaviour
     private float alertDelay;
 
     // 🔴 NEW: Static counter to cycle through alert types
-    private static int alertTypeCounter = 0;
+    private static int alertTypeCounter = 2;
 
     public void SetAlertSettings(CarController car, AlertManager alert, DataCollectionManager data, int limit, float delay)
     {

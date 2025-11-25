@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using TMPro;
 
 public class AlertManager : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class AlertManager : MonoBehaviour
     private int idAlert = 1;
     private DateTime startAlert;
     private DateTime endAlert;
+    public TextMeshProUGUI speedLimitText;
 
 
     private DataCollectionManager dataCollectionManager;
@@ -32,6 +34,11 @@ public class AlertManager : MonoBehaviour
     public void setSpeedAlert(float newSpeed)
     {
         speedThreshold = newSpeed;
+
+        if (speedLimitText != null)
+        {
+            speedLimitText.text = speedThreshold.ToString("0");
+        }
     }
 
     /// <summary>

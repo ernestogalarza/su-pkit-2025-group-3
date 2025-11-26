@@ -12,6 +12,7 @@ public class DataCollectionManager : MonoBehaviour
     private bool isReactionStart = false;
     private float throttleTemporal;
     private int speedLimit;
+    private CarController carController;
 
     private string textOnLog;
 
@@ -20,6 +21,7 @@ public class DataCollectionManager : MonoBehaviour
     void Start()
     {
         steeringWheelManager = GameObject.Find("SteeringWheelManager").GetComponent<SteeringWheelManager>();
+        carController = GameObject.Find("CarDriverController").GetComponent<CarController>();
         alertManager = GameObject.Find("AlertManager").GetComponent<AlertManager>();
         textOnLog = null;
     }
@@ -37,7 +39,10 @@ public class DataCollectionManager : MonoBehaviour
         if (alertManager.getIsAlertVisible() && !isLogStart)
         {
             idTemporal = alertManager.getIdAlert();
-            Debug.Log($"ID: {alertManager.getIdAlert()} - ✅ startAlert {alertManager.getTimeStartAlert().ToString("HH:mm:ss.fff")} - TYPE: {alertManager.getTypeAlert()} - 🎯SPEED: {speedLimit}  ");
+
+            float currentSpeed = carController != null ? carController.getCurrentSpeed() : 0f;
+
+            Debug.Log($"ID: {alertManager.getIdAlert()} - ✅ startAlert {alertManager.getTimeStartAlert().ToString("HH:mm:ss.fff")} - TYPE: {alertManager.getTypeAlert()} - 🎯SPEED: {speedLimit} - INITIAL_SPEED: {currentSpeed:F1}");
             isLogStart = true;
         }
 

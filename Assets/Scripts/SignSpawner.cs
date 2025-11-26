@@ -345,7 +345,7 @@ public class AlertWallDetector : MonoBehaviour
 
         if (car != null || other.name == "ColliderBody")
         {
-           Debug.Log($"✅ Start Speed Limit Section: 🎯{speedLimit} km/h");
+           Debug.Log($"✅ Start Speed Limit Section: 🎯{speedLimit} km/h - Current speed{car.getCurrentSpeed():F1} km/h");
             dataCollectionManager.setSpeedLimit(speedLimit);
 
             // 🔴 NEW: If alert is currently visible, mark it as zone exit
